@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <string.h>
-#define ok printf("OK\n")
 
 //CONSTANTES//
 #define MAX_VEHICULOS 100
