@@ -105,6 +105,9 @@ void cargar_vehiculos(FILE *entrada, vehiculos vector_vehiculos[]){
 
     //var normales
     int codigo_vehiculo;
+    int tipo_vehiculo;
+    int origen_vehiculo;
+    int posee_pasajeros;
     int numero_pasajeros_adut;
     int numero_pasajeros_TCED;
     int tipo_pasaje_adut;
@@ -116,26 +119,28 @@ void cargar_vehiculos(FILE *entrada, vehiculos vector_vehiculos[]){
 
     int indice = 0;
 
-
     //recorrer el archivo hasta fin de archivo 
     while(fscanf(entrada,"%i %i %i %i %i %i %i %s %i\n",&codigo_vehiculo,
                             &numero_pasajeros_adut,&numero_pasajeros_TCED,&tipo_pasaje_adut,
                             &tipo_pasaje_TCED,&peso,&Hora_llegada,placa,&tipo_ferry) != EOF){
-        
         //llenar vector
+        vector_vehiculos[indice].tipo = codigo_vehiculo / 100;
+        vector_vehiculos[indice].procedencia = (codigo_vehiculo / 10) % 10;
+        vector_vehiculos[indice].traslada_pasajeros = codigo_vehiculo % 10;
         vector_vehiculos[indice].Num_pasajeros_adultos = numero_pasajeros_adut;
         vector_vehiculos[indice].Num_pasajeros_tercera_edad = numero_pasajeros_TCED;
         vector_vehiculos[indice].pasaje_adquirido_adut = tipo_pasaje_adut;
         vector_vehiculos[indice].pasaje_adquirido_tercera_ed = tipo_pasaje_TCED;
         vector_vehiculos[indice].peso = (float)peso;
         vector_vehiculos[indice].tiempo_llegada = Hora_llegada;
-
         strcpy(vector_vehiculos[indice].placa,placa);
-        
         vector_vehiculos[indice].tipo_ferry = tipo_ferry;
 
-        printf("%i %i %i %i %i %0.f %i %s %i\n",
+        printf("%i %i %i %i %i %i %i %i %0.f %i %s %i\n",
                 codigo_vehiculo,
+                vector_vehiculos[indice].tipo,
+                vector_vehiculos[indice].procedencia,
+                vector_vehiculos[indice].traslada_pasajeros,
                 vector_vehiculos[indice].Num_pasajeros_adultos,
                 vector_vehiculos[indice].Num_pasajeros_tercera_edad,
                 vector_vehiculos[indice].pasaje_adquirido_adut,
