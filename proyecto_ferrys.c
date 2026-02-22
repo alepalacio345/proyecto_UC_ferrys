@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
 
 //CONSTANTES//
 #define MAX_VEHICULOS 100
@@ -59,14 +60,20 @@ int main(){
 
     //var normales
     int orden[3];
+    int indice_tradicional = 0;
+    int indice_express = 0;
+    bool bandera  = true;
     int cantidad_vehiculos;  //var acumuladora
     int tiempo_menor = 9999;     //menor tiempo te llegada de un vehiculo
     int tiempo_universal; //tiempo de todo el dia
+    int tiempo_carga; //tiempo de todo el dia
 
 
 
     //structuras//
     vehiculos vector_vehiculos[MAX_VEHICULOS];
+    vehiculos vector_colaExpress[MAX_CANTIDAD_COLAS];
+    vehiculos vector_colaTradiccional[MAX_CANTIDAD_COLAS];
 
     //abrir archivos 
     entrada = fopen("ejemplo_entrada.txt","r");
@@ -93,14 +100,51 @@ int main(){
             }
         }
 
-
         tiempo_universal = tiempo_menor;
-        //ciclo que simula el paso del dia minuto a minuto
-        while(tiempo_universal <= 1440){
-            // dia completo
-            tiempo_universal++;
+        // Ciclo que simula el paso del dia minuto a minuto (hasta las 11:59 PM = 1439 mins)
+        while(tiempo_universal < 1440){
 
-        }
+                // 1. REVISAR LLEGADAS EN EL MINUTO ACTUAL
+                for(int i = 0; i < cantidad_vehiculos; i++){
+                    
+                    // Si la hora de llegada del vehiculo coincide con el reloj actual
+                    if(vector_vehiculos[i].tiempo_llegada == tiempo_universal){
+                        
+                        // Verificamos a qué cola va
+                        if(vector_vehiculos[i].tipo_ferry == 1){ 
+                            // Va a la tradicional. Copiamos TODO el struct de un golpe
+                            vector_colaTradiccional[indice_tradicional] = vector_vehiculos[i];
+                            indice_tradicional++; // Solo avanza si metimos un carro
+                            
+                        } else if (vector_vehiculos[i].tipo_ferry == 0) {
+                            // Va a la express. Copiamos TODO el struct de un golpe
+                            vector_colaExpress[indice_express] = vector_vehiculos[i];
+                            indice_express++; // Solo avanza si metimos un carro
+                        }
+                    }
+                }
+
+                // 2. LÓGICA DE CARGA DEL FERRY (El muelle)
+                // calcular el tiempo de carga
+                if(bandera){
+                    // ¡Ojo aquí! La lógica de carga la refinaremos luego, 
+                    // pero este es el lugar correcto para hacerlo.
+                    tiempo_carga = tiempo_universal + 3;
+                    bandera = false;
+                }
+
+                if(tiempo_universal == tiempo_carga){
+                    //cargar vehiculo /se pondra despues/
+                    bandera = true;
+                }
+
+                //EL TIEMPO AVANZA
+                tiempo_universal++;
+
+
+                //terminar mañana o otro dia, el ciclo for esta bien
+                //lo tengo que ver es como es la carga en el ferry y como manejar el tiempo
+            }
 
 
     }
@@ -189,7 +233,7 @@ void cargar_vehiculos(FILE *entrada, vehiculos vector_vehiculos[],int *cantidad_
                 vector_vehiculos[indice].placa,
                 vector_vehiculos[indice].tipo_ferry);
         
-        //acumentar indice
+        //acumentar indice_tradicional
         (*cantidad_vehiculos)++;
         indice++;
 
