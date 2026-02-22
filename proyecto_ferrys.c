@@ -3,6 +3,7 @@
 
 //CONSTANTES//
 #define MAX_VEHICULOS 100
+#define MAX_CANTIDAD_COLAS 70
 
 //ESTRUCTURAS//
 
@@ -47,8 +48,8 @@ typedef struct {
 } ferrys;
 
 //PROTIPADO DE FUNCIONES//
-void cargar_vehiculos(FILE *entrada,vehiculos vector_vehiculos[]);
-
+void cargar_vehiculos(FILE *entrada, vehiculos vector_vehiculos[],int *cantidad_vehiculos);
+int convertir_a_minutos(int hora_militar);
 
 int main(){
 
@@ -58,6 +59,11 @@ int main(){
 
     //var normales
     int orden[3];
+    int cantidad_vehiculos;  //var acumuladora
+    int tiempo_menor = 9999;     //menor tiempo te llegada de un vehiculo
+    int tiempo_universal; //tiempo de todo el dia
+
+
 
     //structuras//
     vehiculos vector_vehiculos[MAX_VEHICULOS];
@@ -77,13 +83,29 @@ int main(){
         printf("%i %i %i\n",orden[0],orden[1],orden[2]);
 
         //llamr a al procedimiento cargar_vehiculos
-        cargar_vehiculos(entrada,vector_vehiculos);
+        cargar_vehiculos(entrada,vector_vehiculos,&cantidad_vehiculos);
+
+        //ciclo para obtener la hora en la que llego el primer carro
+        for(int i = 0; i < cantidad_vehiculos;i++){
+            //encontrar la menor hora
+            if(vector_vehiculos[i].tiempo_llegada < tiempo_menor){
+                tiempo_menor = vector_vehiculos[i].tiempo_llegada;
+            }
+        }
+
+
+        tiempo_universal = tiempo_menor;
+        //ciclo que simula el paso del dia minuto a minuto
+        while(tiempo_universal <= 1440){
+            // dia completo
+            tiempo_universal++;
+
+        }
 
 
     }
 
     //cerrar archivos 
-    puts("Melovax");
     fclose(entrada);
     fclose(salida);
 
@@ -91,6 +113,21 @@ int main(){
 }
 
 //FUNCIONES//
+
+
+/**
+ * @brief Convierte una hora en formato militar a minutos totales
+ * * @param hora_militar La hora de llegada del vehículo leída del archivo en formato militar (HHMM o HMM).
+ * @return int El tiempo total transcurrido en minutos
+ */
+int convertir_a_minutos(int hora_militar) {
+    int horas = hora_militar / 100;
+    int minutos = hora_militar % 100;
+    
+    int minutos_totales = (horas * 60) + minutos;
+    
+    return minutos_totales;
+}
 
 /**
  * @brief Lee los datos del archivo de texto y puebla el arreglo de vehículos.
@@ -101,7 +138,7 @@ int main(){
  * * @param entrada Puntero al archivo de texto (previamente abierto en modo lectura).
  * @param vector_vehiculos Arreglo de estructuras tipo `vehiculos` que será llenado con los datos.
  */
-void cargar_vehiculos(FILE *entrada, vehiculos vector_vehiculos[]){
+void cargar_vehiculos(FILE *entrada, vehiculos vector_vehiculos[],int *cantidad_vehiculos){
 
     //var normales
     int codigo_vehiculo;
@@ -118,6 +155,8 @@ void cargar_vehiculos(FILE *entrada, vehiculos vector_vehiculos[]){
     int tipo_ferry;
 
     int indice = 0;
+    //inicializar contador
+    *cantidad_vehiculos = 0;
 
     //recorrer el archivo hasta fin de archivo 
     while(fscanf(entrada,"%i %i %i %i %i %i %i %s %i\n",&codigo_vehiculo,
@@ -132,7 +171,7 @@ void cargar_vehiculos(FILE *entrada, vehiculos vector_vehiculos[]){
         vector_vehiculos[indice].pasaje_adquirido_adut = tipo_pasaje_adut;
         vector_vehiculos[indice].pasaje_adquirido_tercera_ed = tipo_pasaje_TCED;
         vector_vehiculos[indice].peso = (float)peso;
-        vector_vehiculos[indice].tiempo_llegada = Hora_llegada;
+        vector_vehiculos[indice].tiempo_llegada = convertir_a_minutos(Hora_llegada);
         strcpy(vector_vehiculos[indice].placa,placa);
         vector_vehiculos[indice].tipo_ferry = tipo_ferry;
 
@@ -151,6 +190,7 @@ void cargar_vehiculos(FILE *entrada, vehiculos vector_vehiculos[]){
                 vector_vehiculos[indice].tipo_ferry);
         
         //acumentar indice
+        (*cantidad_vehiculos)++;
         indice++;
 
     }
