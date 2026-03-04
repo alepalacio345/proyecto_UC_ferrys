@@ -52,6 +52,9 @@ typedef struct {
 //PROTIPADO DE FUNCIONES//
 void cargar_vehiculos(FILE *entrada, vehiculos vector_vehiculos[],int *cantidad_vehiculos);
 int convertir_a_minutos(int hora_militar);
+//Falto poner prototipos de estas 2 funciones (GR)
+void cargar_ferrys(int orden[], ferrys vector_ferrys[]);
+bool ferry_esta_lleno(float peso_acumulado, int tipo_ferry);
 
 int main(){
 
@@ -74,7 +77,7 @@ int main(){
 
     //variables acumuladoras de peso del los ferrys
     float peso_actual_del_ferry_Isabela = 0;
-    float peso_actual_del_ferry_Margariteña = 0 ;
+    float peso_actual_del_ferry_Margaritena = 0; //evitar errores con ñ (GR)
     float peso_actual_del_ferry_Lilia = 0;
 
 
@@ -130,7 +133,8 @@ int main(){
                         vector_colaTradiccional[indice_tradicional] = vector_vehiculos[i];
                         indice_tradicional++; // Solo avanza si metimos un carro
                                 
-                    } else if (vector_vehiculos[i].tipo_ferry == 0) {
+                    } else{
+                        //Tipo_ferry == 0 (GR)
                         // Va a la express. Copiamos TODO el struct de un golpe
                         vector_colaExpress[indice_express] = vector_vehiculos[i];
                         indice_express++; // Solo avanza si metimos un carro
@@ -139,7 +143,9 @@ int main(){
                 }
 
             //condicional para saber que tipo de ferry esta en el muelle (tradicional o express)
-            if((ferry_enMuelle == 2) || (ferry_enMuelle == 1)){
+
+         
+            if((ferry_enMuelle == 2) || (ferry_enMuelle == 1)){ //Son ferrys tradicionales
 
                 // validar que se cumpla el tiempo de carga
                 if(!bandera && tiempo_universal == tiempo_carga){
@@ -157,23 +163,28 @@ int main(){
                 // Si el muelle está libre (bandera true) y hay carros esperando en la cola
                 if(bandera && indice_tradicional > 0){
                     //condicional para saber en cual de los dos ferrys estamos cargando
-                    //MARGARITEÑO
+
+                    //EXPRESS
+
+                 
                     if(ferry_enMuelle == 3){
                             
                         // Revisamos si el primer carro de la cola cabe en el ferry
-                        if(!ferry_esta_lleno(peso_actual_del_ferry_Margariteña, 1) ) { 
+                        if(!ferry_esta_lleno(peso_actual_del_ferry_Margaritena, 1)){ 
                             // ¡Sí cabe! Empezamos a cargarlo
                             // (Aquí puedes llamar a tu función para copiar el carro al vector_ferry)
                             tiempo_carga = tiempo_universal + 3; // Bloqueamos por 3 mins
                             bandera = false;                     // El muelle ahora está ocupado
                         } else {
                             // EL FERRY ESTÁ LLENO (o se cumplió la regla del 30%)
+
                             // Aquí iría la lógica para que el ferry zarpe 
                             // y pongas el siguiente ferry de orden[] en el muelle.
                         }
                     //SI NO ES EL ISABELA
                     }else{
-                        peso_actual_del_ferry_Isabela = 0; //cambiar despues
+                        // peso_actual_del_ferry_Isabela = 0; cambiar despues
+
                         // Revisamos si el primer carro de la cola cabe en el ferry
                         if(!ferry_esta_lleno(peso_actual_del_ferry_Isabela, 1)) { 
                             // ¡Sí cabe! Empezamos a cargarlo
@@ -181,7 +192,8 @@ int main(){
                             tiempo_carga = tiempo_universal + 3; // Bloqueamos por 3 mins
                             bandera = false;                     // El muelle ahora está ocupado
                         } else {
-                            // EL FERRY ESTÁ LLENO (o se cumplió la regla del 30%)
+                            // EL FERRY ESTÁ LLENO (o se cumplió la regla del 30%)  
+                            
                             // Aquí iría la lógica para que el ferry zarpe 
                             // y pongas el siguiente ferry de orden[] en el muelle.
                         }
@@ -202,12 +214,12 @@ int main(){
                         }
 
                         // Si el muelle está libre (bandera true) y hay carros esperando en la cola
-                    if(bandera && indice_express > 0){
+                        if(bandera && indice_express > 0){
 
-                        peso_actual_del_ferry_Lilia = 0; //cambiar despues
+                        //peso_actual_del_ferry_Lilia = 0; cambiar despues
                             
                         // Revisamos si el primer carro de la cola cabe en el ferry
-                        if(!ferry_esta_lleno(peso_actual_del_ferry_Lilia,0) ) { 
+                        if(!ferry_esta_lleno(peso_actual_del_ferry_Lilia, 0)) { 
                             // ¡Sí cabe! Empezamos a cargarlo
                             // (Aquí puedes llamar a tu función para copiar el carro al vector_ferry)
                             tiempo_carga = tiempo_universal + 3; // Bloqueamos por 3 mins
@@ -229,6 +241,7 @@ int main(){
     }
 
     //cerrar archivos 
+
     fclose(entrada);
     fclose(salida);
 
@@ -336,7 +349,7 @@ void cargar_vehiculos(FILE *entrada, vehiculos vector_vehiculos[],int *cantidad_
     int numero_pasajeros_TCED;
     int tipo_pasaje_adut;
     int tipo_pasaje_TCED;
-    int peso;
+    float peso; //GR estaba en int peso
     int Hora_llegada;
     char placa[15];
     int tipo_ferry;
@@ -346,10 +359,10 @@ void cargar_vehiculos(FILE *entrada, vehiculos vector_vehiculos[],int *cantidad_
     *cantidad_vehiculos = 0;
 
     //recorrer el archivo hasta fin de archivo 
-    while(fscanf(entrada,"%i %i %i %i %i %i %i %s %i\n",&codigo_vehiculo,
+    while(fscanf(entrada,"%i %i %i %i %i %f %i %s %i\n",&codigo_vehiculo,
                             &numero_pasajeros_adut,&numero_pasajeros_TCED,&tipo_pasaje_adut,
                             &tipo_pasaje_TCED,&peso,&Hora_llegada,placa,&tipo_ferry) != EOF){
-        //llenar vector
+        //llenar vectores
         vector_vehiculos[indice].tipo = codigo_vehiculo / 100;
         vector_vehiculos[indice].procedencia = (codigo_vehiculo / 10) % 10;
         vector_vehiculos[indice].traslada_pasajeros = codigo_vehiculo % 10;
@@ -357,7 +370,18 @@ void cargar_vehiculos(FILE *entrada, vehiculos vector_vehiculos[],int *cantidad_
         vector_vehiculos[indice].Num_pasajeros_tercera_edad = numero_pasajeros_TCED;
         vector_vehiculos[indice].pasaje_adquirido_adut = tipo_pasaje_adut;
         vector_vehiculos[indice].pasaje_adquirido_tercera_ed = tipo_pasaje_TCED;
-        vector_vehiculos[indice].peso = (float)peso;
+        vector_vehiculos[indice].peso = peso;
+         
+    
+        // GR conversión corregida de peso
+        if(vector_vehiculos[indice].tipo == 4){
+            //Guarda el peso en toneladas
+            vector_vehiculos[indice].peso = peso;
+        }else{
+            //Convierte kg a toneladas
+            vector_vehiculos[indice].peso = peso / 1000.0f;  // la f es para division en float
+        }
+
         vector_vehiculos[indice].tiempo_llegada = convertir_a_minutos(Hora_llegada);
         strcpy(vector_vehiculos[indice].placa,placa);
         vector_vehiculos[indice].tipo_ferry = tipo_ferry;
