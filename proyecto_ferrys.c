@@ -51,6 +51,8 @@ typedef struct {
 
 //PROTIPADO DE FUNCIONES//
 void cargar_vehiculos(FILE *entrada, vehiculos vector_vehiculos[],int *cantidad_vehiculos);
+void cargar_ferrys(int orden[], ferrys vector_ferrys[]);
+bool ferry_esta_lleno(float peso_acumulado, int tipo_ferry);
 int convertir_a_minutos(int hora_militar);
 
 int main(){
@@ -71,13 +73,6 @@ int main(){
     int tiempo_menor = 9999;     //menor tiempo te llegada de un vehiculo
     int tiempo_universal; //tiempo de todo el dia
     int tiempo_carga; //tiempo de todo el dia
-
-    //variables acumuladoras de peso del los ferrys
-    float peso_actual_del_ferry_Isabela = 0;
-    float peso_actual_del_ferry_Margariteña = 0 ;
-    float peso_actual_del_ferry_Lilia = 0;
-
-
 
     //structuras//
     vehiculos vector_vehiculos[MAX_VEHICULOS];
@@ -113,8 +108,9 @@ int main(){
             }
         }
         
-        ferry_enMuelle = orden[turno_ferry];
+        float peso_ferry_actual = 0; // Peso del ferry que está en el muelle AHORA
         tiempo_universal = tiempo_menor;
+
         // Ciclo que simula el paso del dia minuto a minuto (hasta las 11:59 PM = 1439 mins)
         while(tiempo_universal < 1440){
 
@@ -139,84 +135,70 @@ int main(){
                 }
 
             //condicional para saber que tipo de ferry esta en el muelle (tradicional o express)
-            if((ferry_enMuelle == 2) || (ferry_enMuelle == 1)){
+            // Extraemos el tipo de ferry (0 = Express, 1 = Tradicional)
+            int tipo_ferry_muelle = vector_ferrys[turno_ferry].tipo;
+            if(tipo_ferry_muelle){ 
 
-                // validar que se cumpla el tiempo de carga
+                // Paso A: ¿Terminamos de cargar el carro anterior?
                 if(!bandera && tiempo_universal == tiempo_carga){
-                    // ¡Carga exitosa!  
-                    //Aquí usas tu ciclo for para rodar la cola hacia adelante
+                    // Rodar la cola
                     for(int j = 0; j < indice_tradicional - 1; j++){
                         vector_colaTradiccional[j] = vector_colaTradiccional[j+1];
                     }
-                    indice_tradicional--; // Le restamos 1 porque sacamos un carro
-                            
-                    //Liberamos el muelle para que pueda entrar otro
+                    indice_tradicional--; // Sacamos un carro
+                    bandera = true;       // Liberamos la rampa
+                }
+
+                // Paso B: ¿Podemos meter un carro nuevo?
+                if(bandera && indice_tradicional > 0){
+                    
+                    // Validamos usando nuestra ÚNICA variable de peso
+                    if(!ferry_esta_lleno(peso_ferry_actual, 1)){ 
+                        
+                        // ¡CABE! Le sumamos su peso al ferry actual
+                        peso_ferry_actual += vector_colaTradiccional[0].peso;
+                        
+                        tiempo_carga = tiempo_universal + 3; // Bloqueamos 3 mins
+                        bandera = false; 
+
+                    } else {
+                        // EL FERRY SE LLENÓ -> ¡ZARPA!
+                        turno_ferry++;         // Que pase el siguiente ferry al muelle
+                        peso_ferry_actual = 0; // El nuevo ferry entra vacío (peso cero)
+                        bandera = true;        // Nos aseguramos que la rampa esté libre
+                    }
+                }
+            }
+            // =========================================================
+            // LÓGICA SI EL FERRY EN EL MUELLE ES EXPRESS
+            // =========================================================
+            else{ 
+                // Paso A: ¿Terminamos de cargar el carro anterior?
+                if(!bandera && tiempo_universal == tiempo_carga){
+                    // Rodar la cola Express
+                    for(int j = 0; j < indice_express - 1; j++){
+                        vector_colaExpress[j] = vector_colaExpress[j+1];
+                    }
+                    indice_express--; 
                     bandera = true; 
                 }
 
-                // Si el muelle está libre (bandera true) y hay carros esperando en la cola
-                if(bandera && indice_tradicional > 0){
-                    //condicional para saber en cual de los dos ferrys estamos cargando
-                    //MARGARITEÑO
-                    if(ferry_enMuelle == 3){
-                            
-                        // Revisamos si el primer carro de la cola cabe en el ferry
-                        if(!ferry_esta_lleno(peso_actual_del_ferry_Margariteña, 1) ) { 
-                            // ¡Sí cabe! Empezamos a cargarlo
-                            // (Aquí puedes llamar a tu función para copiar el carro al vector_ferry)
-                            tiempo_carga = tiempo_universal + 3; // Bloqueamos por 3 mins
-                            bandera = false;                     // El muelle ahora está ocupado
-                        } else {
-                            // EL FERRY ESTÁ LLENO (o se cumplió la regla del 30%)
-                            // Aquí iría la lógica para que el ferry zarpe 
-                            // y pongas el siguiente ferry de orden[] en el muelle.
-                        }
-                    //SI NO ES EL ISABELA
-                    }else{
-                        peso_actual_del_ferry_Isabela = 0; //cambiar despues
-                        // Revisamos si el primer carro de la cola cabe en el ferry
-                        if(!ferry_esta_lleno(peso_actual_del_ferry_Isabela, 1)) { 
-                            // ¡Sí cabe! Empezamos a cargarlo
-                            // (Aquí puedes llamar a tu función para copiar el carro al vector_ferry)
-                            tiempo_carga = tiempo_universal + 3; // Bloqueamos por 3 mins
-                            bandera = false;                     // El muelle ahora está ocupado
-                        } else {
-                            // EL FERRY ESTÁ LLENO (o se cumplió la regla del 30%)
-                            // Aquí iría la lógica para que el ferry zarpe 
-                            // y pongas el siguiente ferry de orden[] en el muelle.
-                        }
-                    }
-                    //LILIA EXPRESS
-                    }else{
-                        // validar que se cumpla el tiempo de carga
-                        if(!bandera && tiempo_universal == tiempo_carga){
-                            // ¡Carga exitosa! 
-                            //Aquí usas tu ciclo for para rodar la cola hacia adelante
-                            for(int j = 0; j < indice_express - 1; j++){
-                                vector_colaExpress[j] = vector_colaExpress[j+1];
-                            }
-                            indice_express--; // Le restamos 1 porque sacamos un carro
-                                
-                            //Liberamos el muelle para que pueda entrar otro
-                            bandera = true; 
-                        }
+                // Paso B: ¿Podemos meter un carro nuevo?
+                if(bandera && indice_express > 0){
+                    
+                    if(!ferry_esta_lleno(peso_ferry_actual, 0)){ 
+                        
+                        // ¡CABE! Le sumamos su peso al ferry actual
+                        peso_ferry_actual += vector_colaExpress[0].peso;
+                        
+                        tiempo_carga = tiempo_universal + 3; 
+                        bandera = false; 
 
-                        // Si el muelle está libre (bandera true) y hay carros esperando en la cola
-                    if(bandera && indice_express > 0){
-
-                        peso_actual_del_ferry_Lilia = 0; //cambiar despues
-                            
-                        // Revisamos si el primer carro de la cola cabe en el ferry
-                        if(!ferry_esta_lleno(peso_actual_del_ferry_Lilia,0) ) { 
-                            // ¡Sí cabe! Empezamos a cargarlo
-                            // (Aquí puedes llamar a tu función para copiar el carro al vector_ferry)
-                            tiempo_carga = tiempo_universal + 3; // Bloqueamos por 3 mins
-                            bandera = false;                     // El muelle ahora está ocupado
-                        } else {
-                            // EL FERRY ESTÁ LLENO (o se cumplió la regla del 30%)
-                            // Aquí iría la lógica para que el ferry zarpe 
-                            // y pongas el siguiente ferry de orden[] en el muelle.
-                        }
+                    } else {
+                        // EL FERRY SE LLENÓ -> ¡ZARPA!
+                        turno_ferry++;         // Que pase el siguiente ferry
+                        peso_ferry_actual = 0; // El nuevo ferry entra vacío
+                        bandera = true;
                     }
                 }
             }
