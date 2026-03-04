@@ -54,6 +54,9 @@ void cargar_vehiculos(FILE *entrada, vehiculos vector_vehiculos[],int *cantidad_
 void cargar_ferrys(int orden[], ferrys vector_ferrys[]);
 bool ferry_esta_lleno(float peso_acumulado, int tipo_ferry);
 int convertir_a_minutos(int hora_militar);
+//Falto poner prototipos de estas 2 funciones (GR)
+void cargar_ferrys(int orden[], ferrys vector_ferrys[]);
+bool ferry_esta_lleno(float peso_acumulado, int tipo_ferry);
 
 int main(){
 
@@ -126,7 +129,8 @@ int main(){
                         vector_colaTradiccional[indice_tradicional] = vector_vehiculos[i];
                         indice_tradicional++; // Solo avanza si metimos un carro
                                 
-                    } else if (vector_vehiculos[i].tipo_ferry == 0) {
+                    } else{
+                        //Tipo_ferry == 0 (GR)
                         // Va a la express. Copiamos TODO el struct de un golpe
                         vector_colaExpress[indice_express] = vector_vehiculos[i];
                         indice_express++; // Solo avanza si metimos un carro
@@ -211,6 +215,7 @@ int main(){
     }
 
     //cerrar archivos 
+
     fclose(entrada);
     fclose(salida);
 
@@ -318,7 +323,7 @@ void cargar_vehiculos(FILE *entrada, vehiculos vector_vehiculos[],int *cantidad_
     int numero_pasajeros_TCED;
     int tipo_pasaje_adut;
     int tipo_pasaje_TCED;
-    int peso;
+    float peso; //GR estaba en int peso
     int Hora_llegada;
     char placa[15];
     int tipo_ferry;
@@ -328,10 +333,10 @@ void cargar_vehiculos(FILE *entrada, vehiculos vector_vehiculos[],int *cantidad_
     *cantidad_vehiculos = 0;
 
     //recorrer el archivo hasta fin de archivo 
-    while(fscanf(entrada,"%i %i %i %i %i %i %i %s %i\n",&codigo_vehiculo,
+    while(fscanf(entrada,"%i %i %i %i %i %f %i %s %i\n",&codigo_vehiculo,
                             &numero_pasajeros_adut,&numero_pasajeros_TCED,&tipo_pasaje_adut,
                             &tipo_pasaje_TCED,&peso,&Hora_llegada,placa,&tipo_ferry) != EOF){
-        //llenar vector
+        //llenar vectores
         vector_vehiculos[indice].tipo = codigo_vehiculo / 100;
         vector_vehiculos[indice].procedencia = (codigo_vehiculo / 10) % 10;
         vector_vehiculos[indice].traslada_pasajeros = codigo_vehiculo % 10;
@@ -339,7 +344,18 @@ void cargar_vehiculos(FILE *entrada, vehiculos vector_vehiculos[],int *cantidad_
         vector_vehiculos[indice].Num_pasajeros_tercera_edad = numero_pasajeros_TCED;
         vector_vehiculos[indice].pasaje_adquirido_adut = tipo_pasaje_adut;
         vector_vehiculos[indice].pasaje_adquirido_tercera_ed = tipo_pasaje_TCED;
-        vector_vehiculos[indice].peso = (float)peso;
+        vector_vehiculos[indice].peso = peso;
+         
+    
+        // GR conversión corregida de peso
+        if(vector_vehiculos[indice].tipo == 4){
+            //Guarda el peso en toneladas
+            vector_vehiculos[indice].peso = peso;
+        }else{
+            //Convierte kg a toneladas
+            vector_vehiculos[indice].peso = peso / 1000.0f;  // la f es para division en float
+        }
+
         vector_vehiculos[indice].tiempo_llegada = convertir_a_minutos(Hora_llegada);
         strcpy(vector_vehiculos[indice].placa,placa);
         vector_vehiculos[indice].tipo_ferry = tipo_ferry;
