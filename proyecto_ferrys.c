@@ -64,16 +64,11 @@ typedef struct {
 //PROTIPADO DE FUNCIONES//
 void cargar_vehiculos(FILE *entrada, vehiculos vector_vehiculos[],int *cantidad_vehiculos);
 void cargar_ferrys(int orden[], ferrys vector_ferrys[]);
-bool ferry_esta_lleno(float peso_acumulado, int tipo_ferry);
 int convertir_a_minutos(int hora_militar);
-
 //(GR) //Logica de zarpado
 bool debe_zarpar(int vehiculos_en_ferry, int vehiculos_en_cola, float peso_actual, ferrys ferry_actual, vehiculos siguiente_en_cola, int pasajeros_actuales, int tiempo_universal);
 
-
-
 int main(){
-
     //variables de archivos
     FILE *entrada;
     FILE *salida;
@@ -301,7 +296,6 @@ int main(){
 
     return 0;
 }
-
 //FUNCIONES//
 
 /**
@@ -355,23 +349,22 @@ int convertir_a_minutos(int hora_militar){
     return minutos_totales;
 }
 
-//Elimine funcion ferry_esta_lleno() porque debe_zarpar() hace lo mismo (GR)
-
-// (GR) VERSION CORREGIDA
-/*
-
-La funcion determina si el ferry que está actualmente en el muelle debe salir en ese minuto de la 
-simulación, evaluando varias reglas operativas: primero verifica que haya alcanzado al menos el 30% mínimo de su 
-capacidad de vehículos (salvo que sea el final del día, donde puede salir forzado), luego revisa si alcanzó la 
-capacidad máxima de vehículos, la capacidad máxima de pasajeros, si ya no quedan vehículos en cola, o si el 
-siguiente vehículo en espera haría que se exceda el peso máximo permitido; si se cumple cualquiera de esas 
-condiciones después de alcanzar el mínimo, la función retorna true y el ferry zarpa, de lo contrario retorna false
-y continúa cargando vehículos
-
-NOTA: Elimine la funcion esta_lleno() porque esta, asi eso tambien y verifica condiciones
-
-
-*/
+/**
+ * @brief Evalúa si el ferry en el muelle cumple las condiciones operativas para zarpar.
+ * * Verifica primero la regla del 30% de capacidad mínima vehicular. Si se cumple, 
+ * el ferry zarpará si alcanza su capacidad máxima de vehículos o pasajeros, si no hay 
+ * más vehículos en cola, o si el ingreso del próximo vehículo excede el peso máximo 
+ * permitido (60 toneladas para Express, 80 toneladas para Tradicional). También 
+ * fuerza el zarpe al finalizar el día (minuto 1439).
+ * * @param vehiculos_en_ferry Cantidad de vehículos ya ingresados al ferry.
+ * @param vehiculos_en_cola Cantidad de vehículos esperando en la rampa.
+ * @param peso_actual Peso total acumulado actualmente en el ferry (en toneladas).
+ * @param ferry_actual Estructura con los datos del ferry que se evalúa.
+ * @param siguiente_en_cola Estructura del próximo vehículo en la cola (para evaluar su peso).
+ * @param pasajeros_actuales Cantidad total de pasajeros a bordo.
+ * @param tiempo_universal Minuto actual de la simulación.
+ * @return true si el ferry debe iniciar su viaje, false si debe seguir esperando/cargando.
+ */
 bool debe_zarpar(int vehiculos_en_ferry,
                  int vehiculos_en_cola,
                  float peso_actual,
