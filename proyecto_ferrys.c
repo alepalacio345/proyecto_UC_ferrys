@@ -56,15 +56,18 @@ typedef struct {
     char nombre[30];
     int tipo;                       // 0=Express, 1=Tradicional
     int estado;                     // 1=Carga, 2=Viaje, 3=Espera
-    int capacidad_vehiculos;
-    int capacidad_pasajeros;
     int tiempo_de_viaje;            // En minutos (35 o 65)
+    int hora_salida;                //hora a la que zarpa
+    float peso_actual;
+    int vehiculos_actuales;
+    int pasajeros_actuales;
 } ferrys;
 
 //PROTIPADO DE FUNCIONES//
 void cargar_vehiculos(FILE *entrada, vehiculos vector_vehiculos[],int *cantidad_vehiculos);
 void cargar_ferrys(int orden[], ferrys vector_ferrys[]);
 int convertir_a_minutos(int hora_militar);
+void reiniciar_tiempo_de_viaje(ferrys vector_ferrys[],int tiempo_actual);
 //(GR) //Logica de zarpado
 bool debe_zarpar(int vehiculos_en_ferry, int vehiculos_en_cola, float peso_actual, ferrys ferry_actual, vehiculos siguiente_en_cola, int pasajeros_actuales, int tiempo_universal);
 
@@ -109,7 +112,7 @@ int main(){
         //llamar al procedimiento para cargar los ferrys segun el orden dado en el archivo
         cargar_ferrys(orden,vector_ferrys);
 
-        //llamr a al procedimiento cargar_vehiculo
+        //llamar a al procedimiento cargar_vehiculo
         cargar_vehiculos(entrada,vector_vehiculos,&cantidad_vehiculos);
         
         //ciclo para obtener la hora en la que llego el primer carro
@@ -127,7 +130,6 @@ int main(){
         int vehiculos_cargados_viaje = 0;
         int pasajeros_actuales = 0;   
         
-
         // Ciclo que simula el paso del dia minuto a minuto (hasta las 11:59 PM = 1439 mins)
         while(tiempo_universal < 1440){
 
@@ -148,154 +150,164 @@ int main(){
                         // Va a la express. Copiamos TODO el struct de un golpe
                         vector_colaExpress[indice_express] = vector_vehiculos[i];
                         indice_express++; // Solo avanza si metimos un carro
+                    }
+                }
+            }
+            
+
+            //preparar para cargar
+            if(vector_ferrys[turno_ferry].estado == 3){
+                vector_ferrys[turno_ferry].estado = 1;
+            }
+
+            //llamos a la funcion reiniciar_tiempo_de_viaje
+            reiniciar_tiempo_de_viaje(vector_ferrys,tiempo_universal);
+
+            //validar que el ferry este listo para cargar
+            if(vector_ferrys[turno_ferry].estado == 1){
+
+                //condicional para saber que tipo de ferry esta en el muelle (tradicional o express)
+                // Extraemos el tipo de ferry (0 = Express, 1 = Tradicional)
+                int tipo_ferry_muelle = vector_ferrys[turno_ferry].tipo;
+                if(tipo_ferry_muelle){ 
+                    // =========================================================
+                    // LÓGICA SI EL FERRY EN EL MUELLE ES TRADICIONAL
+                    // =========================================================
+
+                    // Paso A: ¿Terminamos de cargar el carro anterior?
+                    if(!bandera && tiempo_universal == tiempo_carga){
+                        // Rodar la cola
+                        for(int j = 0; j < indice_tradicional - 1; j++){
+                            vector_colaTradicional[j] = vector_colaTradicional[j+1];
+                        }
+                        indice_tradicional--; // Sacamos un carro
+                        bandera = true;       // Liberamos la rampa
+                    }
+
+                    // Paso B: ¿Podemos meter un carro nuevo?
+                    if(bandera){
+                        if(debe_zarpar(vector_ferrys[turno_ferry].vehiculos_actuales,
+                                       indice_tradicional,
+                                       vector_ferrys[turno_ferry].peso_actual,
+                                       vector_ferrys[turno_ferry],
+                                       vector_colaTradicional[0],
+                                       vector_ferrys[turno_ferry].pasajeros_actuales,
+                                       tiempo_universal)){
+
+                            // ZARPA
+
+                            printf("El ferry %s zarpa en el minuto %d con %d vehiculos y %d pasajeros\n",
+                                   vector_ferrys[turno_ferry].nombre,
+                                   tiempo_universal,
+                                   vector_ferrys[turno_ferry].vehiculos_actuales,
+                                   vector_ferrys[turno_ferry].pasajeros_actuales);
+
+                            vector_ferrys[turno_ferry].hora_salida = tiempo_universal; //guardamos la hora de salida
+                            vector_ferrys[turno_ferry].estado = 2; //cambiar el estado a viajando
+
+                            vector_ferrys[turno_ferry].peso_actual = 0;
+                            vector_ferrys[turno_ferry].pasajeros_actuales = 0;
+                            vector_ferrys[turno_ferry].vehiculos_actuales = 0;
+
+                            turno_ferry = (turno_ferry + 1) % MAX_FERRYS;
+                            bandera = true;
+                            tiempo_carga = 0;
+
+                        }else if(indice_tradicional > 0){
+                            // CARGAR
+                            printf("Minuto %d: Cargando vehiculo %s en ferry %s\n",
+                                   tiempo_universal,
+                                   vector_colaTradicional[0].placa,
+                                   vector_ferrys[turno_ferry].nombre);
+
+                            vector_ferrys[turno_ferry].peso_actual = vector_ferrys[turno_ferry].peso_actual + vector_colaTradicional[0].peso;
+                            vector_ferrys[turno_ferry].pasajeros_actuales = vector_ferrys[turno_ferry].pasajeros_actuales + vector_colaTradicional[0].Num_pasajeros_adultos + vector_colaTradicional[0].Num_pasajeros_tercera_edad + 1;
+                            vector_ferrys[turno_ferry].vehiculos_actuales = vector_ferrys[turno_ferry].vehiculos_actuales + 1;
+
+                            tiempo_carga = tiempo_universal + 3;
+                            bandera = false;
+                        }
+                    }
+
+                }else{
+                    // =========================================================
+                    // LÓGICA SI EL FERRY EN EL MUELLE ES EXPRESS
+                    // =========================================================
+                
+                    // Paso A: ¿Terminamos de cargar el carro anterior?
+                    if(!bandera && tiempo_universal == tiempo_carga){
+                        // Rodar la cola Express
+                        for(int j = 0; j < indice_express - 1; j++){
+                            vector_colaExpress[j] = vector_colaExpress[j+1];
+                        }
+                        indice_express--; 
+                        bandera = true; 
+                    }
+
+
+                    // Paso B: ¿Podemos meter un carro nuevo?
+                    if(bandera){
+
+                        //(GR) Logica de zarpado es la misma para ambos       
+
+                        if(debe_zarpar(vector_ferrys[turno_ferry].vehiculos_actuales,
+                                       indice_express,
+                                       vector_ferrys[turno_ferry].peso_actual,
+                                       vector_ferrys[turno_ferry],
+                                       vector_colaExpress[0],
+                                       vector_ferrys[turno_ferry].pasajeros_actuales,
+                                       tiempo_universal)){
+
+                            // ZARPA
+
+                            printf("El ferry %s zarpa en el minuto %d con %d vehiculos y %d pasajeros\n",
+                                   vector_ferrys[turno_ferry].nombre,
+                                   tiempo_universal,
+                                   vector_ferrys[turno_ferry].vehiculos_actuales,
+                                   vector_ferrys[turno_ferry].pasajeros_actuales);
+                            
+                            vector_ferrys[turno_ferry].hora_salida = tiempo_universal; //guardamos la hora de salida
+                            vector_ferrys[turno_ferry].estado = 2; //cambiar el estado a viajando
+                            
+                            vector_ferrys[turno_ferry].peso_actual = 0;
+                            vector_ferrys[turno_ferry].pasajeros_actuales = 0;
+                            vector_ferrys[turno_ferry].vehiculos_actuales = 0;
+
+                            turno_ferry = (turno_ferry + 1) % MAX_FERRYS;
+                            tiempo_carga = 0;
+                            bandera = true;
+
+                        }else if(indice_express > 0) {
+                            // CARGAR
+
+                            printf("Minuto %d: Cargando vehiculo %s en ferry %s\n",
+                                   tiempo_universal,
+                                   vector_colaExpress[0].placa,
+                                   vector_ferrys[turno_ferry].nombre);
+
+                            vector_ferrys[turno_ferry].peso_actual = vector_ferrys[turno_ferry].peso_actual + vector_colaExpress[0].peso;
+                            vector_ferrys[turno_ferry].pasajeros_actuales = vector_ferrys[turno_ferry].pasajeros_actuales + vector_colaExpress[0].Num_pasajeros_adultos + vector_colaExpress[0].Num_pasajeros_tercera_edad + 1;
+                            vector_ferrys[turno_ferry].vehiculos_actuales = vector_ferrys[turno_ferry].vehiculos_actuales + 1;
+
+                            tiempo_carga = tiempo_universal + 3;
+                            bandera = false;
                         }
                     }
                 }
-
-            //condicional para saber que tipo de ferry esta en el muelle (tradicional o express)
-            // Extraemos el tipo de ferry (0 = Express, 1 = Tradicional)
-            int tipo_ferry_muelle = vector_ferrys[turno_ferry].tipo;
-
-            if(tipo_ferry_muelle){ 
-
-            // =========================================================
-            // LÓGICA SI EL FERRY EN EL MUELLE ES TRADICIONAL
-            // =========================================================
-
-
-
-                // Paso A: ¿Terminamos de cargar el carro anterior?
-                if(!bandera && tiempo_universal == tiempo_carga){
-                    // Rodar la cola
-                    for(int j = 0; j < indice_tradicional - 1; j++){
-                        vector_colaTradicional[j] = vector_colaTradicional[j+1];
-                    }
-                    indice_tradicional--; // Sacamos un carro
-                    bandera = true;       // Liberamos la rampa
-
-                }
-
-                // Paso B: ¿Podemos meter un carro nuevo?
-                if(bandera && indice_tradicional > 0){
-
-                //(GR) Logica de zarpado es la misma para ambos               
-
-                if(debe_zarpar(vehiculos_cargados_viaje,
-                                indice_tradicional,
-                                peso_ferry_actual,
-                                vector_ferrys[turno_ferry],
-                                vector_colaTradicional[0],
-                                pasajeros_actuales, tiempo_universal)){
-
-                        // ZARPA
-
-                        printf("El ferry %s zarpa en el minuto %d con %d vehiculos y %d pasajeros\n",
-                        vector_ferrys[turno_ferry].nombre,
-                        tiempo_universal,
-                        vehiculos_cargados_viaje,
-                        pasajeros_actuales);
-
-
-                        turno_ferry = (turno_ferry + 1) % MAX_FERRYS;
-                        peso_ferry_actual = 0;
-                        vehiculos_cargados_viaje = 0;
-                        pasajeros_actuales = 0;
-                        bandera = true;
-                    }else{
-                        // CARGAR
-                        printf("Minuto %d: Cargando vehiculo %s en ferry %s\n",
-                        tiempo_universal,
-                        vector_colaTradicional[0].placa,
-                        vector_ferrys[turno_ferry].nombre);
-
-                        peso_ferry_actual += vector_colaTradicional[0].peso;
-                        vehiculos_cargados_viaje++;
-
-                        pasajeros_actuales += vector_colaTradicional[0].Num_pasajeros_adultos + vector_colaTradicional[0].Num_pasajeros_tercera_edad + 1;
-
-                        tiempo_carga = tiempo_universal + 3;
-                        bandera = false;
-                    }
-                }
-            
-
-            }else{
-            // =========================================================
-            // LÓGICA SI EL FERRY EN EL MUELLE ES EXPRESS
-            // =========================================================
-            
-                // Paso A: ¿Terminamos de cargar el carro anterior?
-                if(!bandera && tiempo_universal == tiempo_carga){
-                    // Rodar la cola Express
-                    for(int j = 0; j < indice_express - 1; j++){
-                        vector_colaExpress[j] = vector_colaExpress[j+1];
-                    }
-                    indice_express--; 
-                    bandera = true; 
-                }
-
-
-                // Paso B: ¿Podemos meter un carro nuevo?
-                if(bandera && indice_express > 0){
-
-                //(GR) Logica de zarpado es la misma para ambos       
-
-                if(debe_zarpar(vehiculos_cargados_viaje,
-                            indice_express,
-                            peso_ferry_actual,
-                            vector_ferrys[turno_ferry],
-                            vector_colaExpress[0],
-                            pasajeros_actuales, tiempo_universal)){
-
-                    // ZARPA
-
-                    printf("El ferry %s zarpa en el minuto %d con %d vehiculos y %d pasajeros\n",
-                    vector_ferrys[turno_ferry].nombre,
-                    tiempo_universal,
-                    vehiculos_cargados_viaje,
-                    pasajeros_actuales);
-
-
-                    turno_ferry = (turno_ferry + 1) % MAX_FERRYS;
-                    peso_ferry_actual = 0;
-                    vehiculos_cargados_viaje = 0;
-                    pasajeros_actuales = 0;
-                    bandera = true;
-                }else{
-                    // CARGAR
-
-                    printf("Minuto %d: Cargando vehiculo %s en ferry %s\n",
-                    tiempo_universal,
-                    vector_colaExpress[0].placa,
-                    vector_ferrys[turno_ferry].nombre);
-
-                    peso_ferry_actual += vector_colaExpress[0].peso;
-                    vehiculos_cargados_viaje++;
-
-                    pasajeros_actuales += vector_colaExpress[0].Num_pasajeros_adultos + vector_colaExpress[0].Num_pasajeros_tercera_edad + 1;
-
-                    tiempo_carga = tiempo_universal + 3;
-                    bandera = false;
-                }
-                }
-
             }
-        
 
-                //EL TIEMPO AVANZA
-              tiempo_universal++;
+            //EL TIEMPO AVANZA
+            tiempo_universal++;
         }
-
-    
     }
 
     //cerrar archivos 
-
     fclose(entrada);
     fclose(salida);
 
     return 0;
 }
+
 //FUNCIONES//
 
 /**
@@ -312,16 +324,27 @@ void cargar_ferrys(int orden[], ferrys vector_ferrys[]){
     strcpy(vectores_auxiliar[0].nombre, "Lilia Concepcion");
     vectores_auxiliar[0].tiempo_de_viaje = 35;
     vectores_auxiliar[0].tipo = 0; 
+    vectores_auxiliar[0].estado = 3;
 
     // Ferry ID 2 (Tradicional)
     strcpy(vectores_auxiliar[1].nombre, "La Isabela");
-    vectores_auxiliar[1].tiempo_de_viaje = 65;
-    vectores_auxiliar[1].tipo = 1;
 
     // Ferry ID 3 (Tradicional)
-    strcpy(vectores_auxiliar[2].nombre, "La Margariteña");
-    vectores_auxiliar[2].tiempo_de_viaje = 65;
-    vectores_auxiliar[2].tipo = 1;
+    strcpy(vectores_auxiliar[2].nombre, "La Margaritena");
+
+    for(int j = 1; j <= 2;j++){
+        vectores_auxiliar[j].tiempo_de_viaje = 65;
+        vectores_auxiliar[j].tipo = 1;
+        vectores_auxiliar[j].estado = 3;
+    }
+
+    //inicializar peso_actual, hora_salida, pasajeros y vehiculos
+    for(int i = 0;i < 3;i++){
+        vectores_auxiliar[i].hora_salida = 0;
+        vectores_auxiliar[i].peso_actual = 0; 
+        vectores_auxiliar[i].pasajeros_actuales = 0; 
+        vectores_auxiliar[i].vehiculos_actuales = 0;
+    }
 
     // Asignación al arreglo final según el ticket de 'orden'
     for(int i = 0; i < 3; i++) {
@@ -397,11 +420,11 @@ bool debe_zarpar(int vehiculos_en_ferry,
     // REGLA 0: Si no ha llegado al 30%, NO puede zarpar
     if (vehiculos_en_ferry < cap_min) {
 
-    // Si es el final del día, zarpa igual
-    if (tiempo_universal >= 1439)
-        return true;
+        // Si es el final del día, zarpa igual
+        if (tiempo_universal >= 1439)
+            return true;
 
-    return false;
+        return false;
     }
 
     // REGLA 1: Capacidad máxima de vehículos
@@ -500,4 +523,28 @@ void cargar_vehiculos(FILE *entrada, vehiculos vector_vehiculos[],int *cantidad_
         indice++;
 
     }
+
+}
+
+
+void reiniciar_tiempo_de_viaje(ferrys vector_ferrys[],int tiempo_actual){
+
+    //var
+    int tiempo_regreso;
+
+    for(int i = 0; i < MAX_FERRYS; i++){
+        //validar que el ferry si alla salido
+        if((vector_ferrys[i].hora_salida > 0) && (vector_ferrys[i].estado == 2) ){
+            //calculamos la hora que tiene que llegar el ferry al muelle
+            tiempo_regreso = vector_ferrys[i].hora_salida + vector_ferrys[i].tiempo_de_viaje;
+
+            //validamos si ese tiempo se cumplio 
+            if(tiempo_regreso == tiempo_actual){
+                vector_ferrys[i].estado = 3; //entonces cambiamos su estado a espera
+                vector_ferrys[i].hora_salida = 0; //reiniciamos la hora de salida a 0
+            }
+        }
+    }
+        
+        
 }
