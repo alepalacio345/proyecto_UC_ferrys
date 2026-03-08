@@ -1,13 +1,12 @@
 Carga Nro. 1:
 Ferry Lilia Concepcion
 Viaje Nro. 1
-Num. vehiculos: 6
-Num. pasajeros: 12 (2 mayores de edad)
-Peso: 37.70 toneladas
-Ingreso: 11320.00 BsF.
+Num. vehiculos: 5
+Num. pasajeros: 10 (1 mayores de edad)
+Peso: 34.70 toneladas
+Ingreso: 10800.00 BsF.
 ID: CD345CC 	 Tipo: liviano
 ID: EV677VU 	 Tipo: policial
-ID: VY778TS 	 Tipo: ambulancia
 ID: XE789FA 	 Tipo: carga
 ID: GT344FC 	 Tipo: rustico
 ID: XE787GE 	 Tipo: carga
@@ -15,17 +14,18 @@ ID: XE787GE 	 Tipo: carga
 Carga Nro. 2:
 Ferry La Margaritena
 Viaje Nro. 2
-Num. vehiculos: 2
-Num. pasajeros: 5 (0 mayores de edad)
-Peso: 6.70 toneladas
-Ingreso: 2310.00 BsF.
+Num. vehiculos: 3
+Num. pasajeros: 7 (1 mayores de edad)
+Peso: 9.70 toneladas
+Ingreso: 2500.50 BsF.
+ID: VY778TS 	 Tipo: ambulancia
 ID: AE786CA 	 Tipo: microbus
 ID: TR900AA 	 Tipo: liviano
 
 Estadisticas:
 Total vehiculos transportados: 8
 Total pasajeros transportados: 17
-Total de ingresos: 13630.00 BsF.
+Total de ingresos: 13300.50 BsF.
 Num. pasajeros no trasladados: 0
 Vehiculo mas frecuente: liviano
 Mayor frec. vehiculos en espera: 6 (a las 0806)

@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
-      "cwd": "c:/Users/Garco/Desktop/CProyecto2026/proyecto_UC_ferrys",
-      "program": "c:/Users/Garco/Desktop/CProyecto2026/proyecto_UC_ferrys/build/Debug/outDebug",
+      "cwd": "c:/Users/Garco/Desktop/proyecto_UC_ferrys",
+      "program": "c:/Users/Garco/Desktop/proyecto_UC_ferrys/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [

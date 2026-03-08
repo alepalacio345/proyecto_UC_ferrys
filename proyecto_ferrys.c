@@ -25,16 +25,16 @@
 #define T_MAYOR_TUR_EXP 320.00
 
 // TARIFAS DE VEHÍCULOS (TRADICIONAL)
-#define V_LIVIANO_TRAD 590.00
-#define V_RUSTICO_TRAD 710.00
-#define V_MICROBUS_TRAD 850.00
-#define V_CARGA_TRAD 1200.00
+#define V_LIVIANO_TRAD 590.00f
+#define V_RUSTICO_TRAD 710.00f
+#define V_MICROBUS_TRAD 850.00f
+#define V_CARGA_TRAD 1200.00f
 
 // TARIFAS DE VEHÍCULOS (EXPRESS)
-#define V_LIVIANO_EXP 1090.00
-#define V_RUSTICO_EXP 1310.00
-#define V_MICROBUS_EXP 1600.00
-#define V_CARGA_EXP 2400.00
+#define V_LIVIANO_EXP 1090.00f
+#define V_RUSTICO_EXP 1310.00f
+#define V_MICROBUS_EXP 1600.00f
+#define V_CARGA_EXP 2400.00f
 
 //ESTRUCTURAS//
     
@@ -103,9 +103,9 @@ int main(){
 
     //var normales
     int orden[3];
-    int ferry_enMuelle;
+
     int turno_ferry = 0; //iniciar en el primero y al zarpar incrementar
-    char ferry_nombre_turno[20];
+
     int indice_tradicional = 0;
     int indice_express = 0;
     bool bandera  = true;
@@ -130,13 +130,14 @@ int main(){
     ferrys vector_ferrys[MAX_FERRYS];
 
     //abrir archivos 
-    entrada = fopen("ejemplo_entrada.txt","r");
+    entrada = fopen("proy1.in","r");
     salida  = fopen("proy1.out","w");
 
     if(entrada == NULL){
         printf("error al abrir el archivo\n");
+
     }else{
-        printf("Biendenido al programa\n");
+        printf("Bienvenido al programa: \n");
 
         //orden de carga de ferrys
         fscanf(entrada,"%i %i %i\n",&orden[0],&orden[1],&orden[2]);
@@ -155,12 +156,8 @@ int main(){
             }
         }
         
-        float peso_ferry_actual = 0; // Peso del ferry que está en el muelle AHORA
-        tiempo_universal = tiempo_menor;
 
-        // (GR) contadores de pasajeros y vehiculos actuales
-        int vehiculos_cargados_viaje = 0;
-        int pasajeros_actuales = 0;   
+          tiempo_universal = tiempo_menor;
         
         // Ciclo que simula el paso del dia minuto a minuto (hasta las 11:59 PM = 1439 mins)
         while(tiempo_universal < 1440){
@@ -612,9 +609,6 @@ void cargar_vehiculos(FILE *entrada, vehiculos vector_vehiculos[],int *cantidad_
 
     //var normales
     int codigo_vehiculo;
-    int tipo_vehiculo;
-    int origen_vehiculo;
-    int posee_pasajeros;
     int numero_pasajeros_adut;
     int numero_pasajeros_TCED;
     int tipo_pasaje_adut;
@@ -793,14 +787,15 @@ void procesar_salida(ferrys ferry_actual, FILE *salida, int numero_viaje,
             // Vehículos de emergencia viajan gratis (se asume 0 BsF)
             
             // Pasajes de personas
+            //casteo necesario (float) (GR)
             if (v.traslada_pasajeros == 1) {
                 // Adultos
-                if (v.pasaje_adquirido_adut == 0) ingreso_viaje += (v.Num_pasajeros_adultos * T_ADULTO_VIP_TRAD);
-                else ingreso_viaje += (v.Num_pasajeros_adultos * T_ADULTO_TUR_TRAD);
+                if (v.pasaje_adquirido_adut == 0) ingreso_viaje += (float)(v.Num_pasajeros_adultos * T_ADULTO_VIP_TRAD);
+                else ingreso_viaje += (float)(v.Num_pasajeros_adultos * T_ADULTO_TUR_TRAD);
                 
                 // Tercera Edad
-                if (v.pasaje_adquirido_tercera_ed == 0) ingreso_viaje += (v.Num_pasajeros_tercera_edad * T_MAYOR_VIP_TRAD);
-                else ingreso_viaje += (v.Num_pasajeros_tercera_edad * T_MAYOR_TUR_TRAD);
+                if (v.pasaje_adquirido_tercera_ed == 0) ingreso_viaje += (float)(v.Num_pasajeros_tercera_edad * T_MAYOR_VIP_TRAD);
+                else ingreso_viaje += (float)(v.Num_pasajeros_tercera_edad * T_MAYOR_TUR_TRAD);
             }
             
         } else { 
@@ -814,12 +809,12 @@ void procesar_salida(ferrys ferry_actual, FILE *salida, int numero_viaje,
             // Pasajes de personas
             if (v.traslada_pasajeros == 1) {
                 // Adultos
-                if (v.pasaje_adquirido_adut == 0) ingreso_viaje += (v.Num_pasajeros_adultos * T_ADULTO_VIP_EXP);
-                else ingreso_viaje += (v.Num_pasajeros_adultos * T_ADULTO_TUR_EXP);
+                if (v.pasaje_adquirido_adut == 0) ingreso_viaje += (float)(v.Num_pasajeros_adultos * T_ADULTO_VIP_EXP);
+                else ingreso_viaje += (float)(v.Num_pasajeros_adultos * T_ADULTO_TUR_EXP);
                 
                 // Tercera Edad
-                if (v.pasaje_adquirido_tercera_ed == 0) ingreso_viaje += (v.Num_pasajeros_tercera_edad * T_MAYOR_VIP_EXP);
-                else ingreso_viaje += (v.Num_pasajeros_tercera_edad * T_MAYOR_TUR_EXP);
+                if (v.pasaje_adquirido_tercera_ed == 0) ingreso_viaje += (float)(v.Num_pasajeros_tercera_edad * T_MAYOR_VIP_EXP);
+                else ingreso_viaje += (float)(v.Num_pasajeros_tercera_edad * T_MAYOR_TUR_EXP);
             }
         }
     }
