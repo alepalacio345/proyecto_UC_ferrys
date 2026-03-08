@@ -664,7 +664,16 @@ void cargar_vehiculos(FILE *entrada, vehiculos vector_vehiculos[],int *cantidad_
 
 }
 
-
+/**
+ * @brief Verifica el tiempo de viaje de los ferrys y actualiza su estado al regresar al muelle.
+ * * Recorre el arreglo de ferrys buscando aquellos que se encuentren actualmente navegando (estado 2).
+ * Calcula el tiempo exacto en el que deben regresar al muelle sumando su hora de salida y su tiempo
+ * de viaje predeterminado. Si el tiempo actual de la simulación coincide con esa hora de regreso, 
+ * el ferry cambia su estado a "Espera" (estado 3) y reinicia su hora de salida a 0, quedando libre 
+ * para iniciar un nuevo proceso de carga.
+ * * @param vector_ferrys Arreglo que contiene las estructuras de todos los ferrys de la flota.
+ * @param tiempo_actual El minuto actual de la simulación (tiempo universal).
+ */
 void reiniciar_tiempo_de_viaje(ferrys vector_ferrys[],int tiempo_actual){
 
     //var
