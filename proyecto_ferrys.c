@@ -119,7 +119,7 @@ void insertar_emergencia_cola(vehiculos cola[], int *indice, vehiculos nuevo);
 bool debe_zarpar(ferrys ferry_actual,int vehiculos_en_ferry,int vehiculos_en_cola,int pasajeros_actuales,float peso_actual,vehiculos siguiente_en_cola,int tiempo_universal);
 void procesar_carga_ferry(ferrys vector_ferrys[],int *turno_ferry,vehiculos cola[],int *indice_cola,bool *rampa_libre,int *tiempo_carga, int tiempo_universal,FILE *salida,int *numero_viaje_global,int *total_dia_vehiculos,int *total_dia_pasajeros,float *total_dia_ingresos,int frecuencia_tipos[]);
 void procesar_salida(ferrys ferry_actual, FILE *salida, int numero_viaje, int *dia_total_vehiculos, int *dia_total_pasajeros, float *dia_total_ingresos, int frec_vehiculos[]);
-
+void limpiar_consola();
 
 int main(){
     //variables de archivos
@@ -158,11 +158,33 @@ int main(){
     entrada = fopen("proy1.in","r");
     salida  = fopen("proy1.out","w");
 
+    limpiar_consola(); // limpiar mensajes anteriores de la pantalla
+
     if(entrada == NULL){
         printf("error al abrir el archivo\n");
         return 1;
     }else{
-        printf("Bienvenido al programa: \n");
+
+        // ========================================================
+        //mensaje de bienvenida 
+        printf("\n");
+        printf("  ======================================================\n");
+        printf("  |                                                    |\n");
+        printf("  |               FERRYS MARGARITA                     |\n");
+        printf("  |      Simulador de Operaciones Navieras v1.0        |\n");
+        printf("  |               El Margariteno C.A.                  |\n");
+        printf("  |                                                    |\n");
+        printf("  ======================================================\n");
+        printf("          \\                           /                 \n");
+        printf("           \\_________________________//                 \n");
+        printf("     _______|_______|_______|_______|_______            \n");
+        printf("    \\                                       /           \n");
+        printf("  ~~~\\_____________________________________/~~~         \n");
+        printf("       ~~~~       ~~~~~        ~~~~      ~~~~           \n");
+        printf("  ======================================================\n\n");
+        printf("  [+] Iniciando reloj universal...\n");
+        printf("  [+] Abriendo terminal de pasajeros...\n\n");
+        // ========================================================
 
         // 1. Validar que el archivo no esté vacío y tenga 3 números
         if(fscanf(entrada,"%i %i %i\n",&orden[0],&orden[1],&orden[2]) != 3){
@@ -205,11 +227,9 @@ int main(){
         // Ciclo que simula el paso del dia minuto a minuto (hasta las 11:59 PM = 1439 mins)
         
         while(tiempo_universal <= 1439){
-            
             // --- Fase 1: Gestión de Arribos ---
             // Clasifica vehículos entrantes en sus respectivas colas (Express o Tradicional)
             // priorizando servicios de emergencia (Ambulancia, Bomberos, Policía).
-
             for(int i = 0; i < cantidad_vehiculos; i++){
                 // Si la hora de llegada del vehiculo coincide con el reloj actual
                 if(vector_vehiculos[i].tiempo_llegada == tiempo_universal){
@@ -368,6 +388,17 @@ int main(){
         for(int i = 0; i < indice_express; i++){
             pasajeros_varados += vector_colaExpress[i].Num_pasajeros_adultos + vector_colaExpress[i].Num_pasajeros_tercera_edad; 
         }
+
+        // 2. Contar los que se quedaron ATRAPADOS DENTRO de los ferrys que no zarparon
+        for(int f = 0; f < MAX_FERRYS; f++){
+            if(vector_ferrys[f].estado != 2 && vector_ferrys[f].vehiculos_actuales > 0){
+                for(int i = 0; i < vector_ferrys[f].vehiculos_actuales; i++){
+                    pasajeros_varados += vector_ferrys[f].info_vehiculos_actuales[i].Num_pasajeros_adultos + 
+                                         vector_ferrys[f].info_vehiculos_actuales[i].Num_pasajeros_tercera_edad + 1;
+                }
+            }
+        }
+
 
         int max_freq = 0;
         int tipo_mas_frecuente = 1;
@@ -540,12 +571,6 @@ void cargar_vehiculos(FILE *entrada, vehiculos vector_vehiculos[],int *cantidad_
         if(tipo < 1 || tipo > 7) continue;//ignorar vehiculo invalido
         vector_vehiculos[indice].tipo = tipo;
 
-        if(tipo == 4){
-            //Vehiculo de carga no debe transportar pasajeros
-            numero_pasajeros_adut = 0;
-            numero_pasajeros_TCED = 0;
-        }
-
         int proced = vector_vehiculos[indice].procedencia = (codigo_vehiculo / 10) % 10;
         if(proced < 0 || proced > 2) continue;//Procedencia invalida
         
@@ -560,6 +585,12 @@ void cargar_vehiculos(FILE *entrada, vehiculos vector_vehiculos[],int *cantidad_
         if(numero_pasajeros_TCED < 0 || numero_pasajeros_TCED > 20) numero_pasajeros_TCED = 0;
         vector_vehiculos[indice].Num_pasajeros_tercera_edad = numero_pasajeros_TCED;
         
+        if((vector_vehiculos[indice].Num_pasajeros_adultos + vector_vehiculos[indice].Num_pasajeros_tercera_edad) > 20){
+            // Si la suma de ambos da más de 20 (ej. 15 + 15), es un dato corrupto.
+            // Por seguridad, anulamos los pasajeros de ese vehículo.
+            vector_vehiculos[indice].Num_pasajeros_adultos = 0;
+            vector_vehiculos[indice].Num_pasajeros_tercera_edad = 0;
+        }
 
         //Validar tipo de pasaje (VIP 0, Turista 1)
         if(tipo_pasaje_adut != 0 && tipo_pasaje_adut != 1)tipo_pasaje_adut = 1;
@@ -967,8 +998,8 @@ bool debe_zarpar(ferrys ferry_actual,int vehiculos_en_ferry,int vehiculos_en_col
     bool respuesta_zarpe = false; 
     float peso_max = (ferry_actual.tipo == 0) ? 60.0 : 80.0;
 
-    // REGLA 1: Fin del día (Zarpa sí o sí)
-    if (tiempo_universal >= 1439) {
+    // REGLA 1: Fin del día (Zarpa sí o sí, PERO solo si tiene al menos 1 carro)
+    if (tiempo_universal >= 1439 && vehiculos_en_ferry > 0) {
         respuesta_zarpe = true;
     }
     // REGLA 2: Límite máximo de vehículos alcanzado
@@ -1116,4 +1147,26 @@ void procesar_salida(ferrys ferry_actual, FILE *salida, int numero_viaje,
     *dia_total_vehiculos += ferry_actual.vehiculos_actuales;
     *dia_total_pasajeros += ferry_actual.pasajeros_actuales;
     *dia_total_ingresos += ingreso_viaje;
+}
+
+
+
+
+/**
+ * @brief Limpia la pantalla de la consola o terminal.
+ * * @details Utiliza directivas de preprocesador para detectar el sistema operativo 
+ * en el que se está ejecutando el programa. Si detecta un entorno Windows (_WIN32), 
+ * invoca el comando "cls". Si detecta un entorno tipo Unix (Linux), 
+ * invoca el comando "clear".
+ * * @note Requiere que la librería <stdlib.h> esté incluida en el archivo para 
+ * poder hacer uso de la función del sistema system().
+ */
+void limpiar_consola(){
+
+#ifdef _WIN32
+    system("cls");
+#else
+    system("clear");
+#endif
+
 }
