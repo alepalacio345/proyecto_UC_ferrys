@@ -24,10 +24,35 @@
 */
 var NAVTREE =
 [
-  [ "proyecto_ferrys", "index.html", [
-    [ "Classes", "annotated.html", [
-      [ "Class List", "annotated.html", "annotated_dup" ],
-      [ "Class Index", "classes.html", null ]
+  [ "Simulador Ferrys Margarita", "index.html", [
+    [ "⛴️ Simulador de Flota de Ferrys (Máquina de Estados)", "md__r_e_a_d_m_e.html", [
+      [ "⚙️ Características Principales", "md__r_e_a_d_m_e.html#autotoc_md1", null ],
+      [ "🛠️ Tecnologías Usadas", "md__r_e_a_d_m_e.html#autotoc_md2", null ],
+      [ "📋 Formato del Archivo de Entrada (<span class=\"tt\">.txt</span>)", "md__r_e_a_d_m_e.html#autotoc_md3", null ],
+      [ "🚀 Compilación y Ejecución", "md__r_e_a_d_m_e.html#autotoc_md4", null ],
+      [ "⛴️ Simulador de Flota de Ferrys (Máquina de Estados)", "md__r_e_a_d_m_e.html#autotoc_md5", [
+        [ "⚙️ Características Principales", "md__r_e_a_d_m_e.html#autotoc_md6", null ],
+        [ "🛠️ Tecnologías Usadas", "md__r_e_a_d_m_e.html#autotoc_md7", null ],
+        [ "📋 Formato del Archivo de Entrada (<span class=\"tt\">.txt</span>)", "md__r_e_a_d_m_e.html#autotoc_md8", null ],
+        [ "🚀 Compilación y Ejecución", "md__r_e_a_d_m_e.html#autotoc_md9", null ],
+        [ "📊 Reportes Generados", "md__r_e_a_d_m_e.html#autotoc_md10", null ]
+      ] ]
+    ] ],
+    [ "Data Structures", "annotated.html", [
+      [ "Data Structures", "annotated.html", "annotated_dup" ],
+      [ "Data Structure Index", "classes.html", null ],
+      [ "Data Fields", "functions.html", [
+        [ "All", "functions.html", null ],
+        [ "Variables", "functions_vars.html", null ]
+      ] ]
+    ] ],
+    [ "Files", "files.html", [
+      [ "File List", "files.html", "files_dup" ],
+      [ "Globals", "globals.html", [
+        [ "All", "globals.html", null ],
+        [ "Functions", "globals_func.html", null ],
+        [ "Macros", "globals_defs.html", null ]
+      ] ]
     ] ]
   ] ]
 ];

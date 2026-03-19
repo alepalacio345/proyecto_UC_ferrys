@@ -1,5 +1,5 @@
 var annotated_dup =
 [
-    [ "ferrys", "structferrys.html", null ],
-    [ "vehiculos", "structvehiculos.html", null ]
+    [ "ferrys", "structferrys.html", "structferrys" ],
+    [ "vehiculos", "structvehiculos.html", "structvehiculos" ]
 ];

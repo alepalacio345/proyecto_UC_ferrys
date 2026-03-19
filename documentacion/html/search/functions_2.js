@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['hacer_5fespacio_5femergencia_0',['hacer_espacio_emergencia',['../proyecto__ferrys_8c.html#a981b4425cfb18937f87f966a8224ea7a',1,'proyecto_ferrys.c']]]
+  ['debe_5fzarpar_0',['debe_zarpar',['../proyecto__ferrys_8c.html#ae8271d75a5c144af14f9b8cdc0162128',1,'proyecto_ferrys.c']]]
 ];

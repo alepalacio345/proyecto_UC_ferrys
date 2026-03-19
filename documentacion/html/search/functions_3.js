@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['main_0',['main',['../proyecto__ferrys_8c.html#ae66f6b31b5ad750f1fe042a706a4e3d4',1,'proyecto_ferrys.c']]]
+  ['hacer_5fespacio_5femergencia_0',['hacer_espacio_emergencia',['../proyecto__ferrys_8c.html#a981b4425cfb18937f87f966a8224ea7a',1,'proyecto_ferrys.c']]]
 ];

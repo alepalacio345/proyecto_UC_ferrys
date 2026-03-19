@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['procesar_5fsalida_0',['procesar_salida',['../proyecto__ferrys_8c.html#a98a8368f4f8f404ce8ca48b52ba07db7',1,'proyecto_ferrys.c']]]
+  ['insertar_5femergencia_5fcola_0',['insertar_emergencia_cola',['../proyecto__ferrys_8c.html#aaad54e2dc3e4225eafb894d7826b40c6',1,'proyecto_ferrys.c']]]
 ];

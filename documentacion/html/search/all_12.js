@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['⛴️_20simulador_20de_20flota_20de_20ferrys_20máquina_20de_20estados_0',['⛴️ Simulador de Flota de Ferrys Máquina de Estados',['../C:/Users/slara/OneDrive/proyectos profesionales/proyecto de programacion 2026/README.md#autotoc_md0',1,'⛴️ Simulador de Flota de Ferrys (Máquina de Estados)'],['../C:/Users/slara/OneDrive/proyectos profesionales/proyecto de programacion 2026/README.md#autotoc_md5',1,'⛴️ Simulador de Flota de Ferrys (Máquina de Estados)']]]
+  ['y_20ejecución_0',['y Ejecución',['../md__r_e_a_d_m_e.html#autotoc_md4',1,'🚀 Compilación y Ejecución'],['../md__r_e_a_d_m_e.html#autotoc_md9',1,'🚀 Compilación y Ejecución']]]
 ];

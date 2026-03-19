@@ -5,11 +5,14 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.14.0"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Simulacion de Flota de ferrys: ferrys Struct Reference</title>
+<title>Simulador Ferrys Margarita: ferrys Struct Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
 <script type="text/javascript" src="clipboard.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
 <script type="text/javascript" src="cookie.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
@@ -23,7 +26,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">Simulacion de Flota de ferrys
+   <div id="projectname">Simulador Ferrys Margarita
    </div>
   </td>
  </tr>
@@ -42,11 +45,27 @@ $(function() { codefold.init(); });
 <script type="text/javascript" src="menu.js"></script>
 <script type="text/javascript">
 $(function() {
-  initMenu('',true,false,'search.php','Search',false);
+  initMenu('',true,false,'search.php','Search',true);
   $(function() { init_search(); });
 });
 </script>
 <div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){initNavTree('structferrys.html','',''); });
+</script>
+<div id="container">
+<div id="doc-content">
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -68,11 +87,7 @@ $(function() {
 </div>
 </div>
 
-</div><!-- top -->
-<div id="doc-content">
 <div class="header">
-  <div class="summary">
-<a href="#pub-attribs">Data Fields</a>  </div>
   <div class="headertitle"><div class="title">ferrys Struct Reference</div></div>
 </div><!--header-->
 <div class="contents">
@@ -94,7 +109,7 @@ Data Fields</h2></td></tr>
 <tr class="memitem:a411389e519577333688413f2e7fc03ca" id="r_a411389e519577333688413f2e7fc03ca"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a411389e519577333688413f2e7fc03ca">cap_pasajeros</a></td></tr>
 <tr class="memitem:a73905de2033d203f1839318e1ff0bd7f" id="r_a73905de2033d203f1839318e1ff0bd7f"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a73905de2033d203f1839318e1ff0bd7f">vehiculos_actuales</a></td></tr>
 <tr class="memitem:a62b8616c75c1178f0d5f54e919d19176" id="r_a62b8616c75c1178f0d5f54e919d19176"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a62b8616c75c1178f0d5f54e919d19176">pasajeros_actuales</a></td></tr>
-<tr class="memitem:a860e813ca4a381cf5a954c1603499e52" id="r_a860e813ca4a381cf5a954c1603499e52"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structvehiculos.html">vehiculos</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a860e813ca4a381cf5a954c1603499e52">info_vehiculos_actuales</a> [20]</td></tr>
+<tr class="memitem:a37fcf4f7247832f9755ac7f6ebe1b61d" id="r_a37fcf4f7247832f9755ac7f6ebe1b61d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structvehiculos.html">vehiculos</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a37fcf4f7247832f9755ac7f6ebe1b61d">info_vehiculos_actuales</a> [<a class="el" href="proyecto__ferrys_8c.html#a25c10a3ecea1866f766a2af7a7bf7da0">MAX_VEHICULOS</a>]</td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Representa un barco de la flota y su estado actual en la simulación. Gestiona las capacidades máximas (peso y vehículos), tiempos de ciclo y la máquina de estados (Carga, Viaje, Espera) para el control del flujo. </p>
@@ -169,14 +184,14 @@ Data Fields</h2></td></tr>
 
 </div>
 </div>
-<a id="a860e813ca4a381cf5a954c1603499e52" name="a860e813ca4a381cf5a954c1603499e52"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a860e813ca4a381cf5a954c1603499e52">&#9670;&#160;</a></span>info_vehiculos_actuales</h2>
+<a id="a37fcf4f7247832f9755ac7f6ebe1b61d" name="a37fcf4f7247832f9755ac7f6ebe1b61d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a37fcf4f7247832f9755ac7f6ebe1b61d">&#9670;&#160;</a></span>info_vehiculos_actuales</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="structvehiculos.html">vehiculos</a> ferrys::info_vehiculos_actuales[20]</td>
+          <td class="memname"><a class="el" href="structvehiculos.html">vehiculos</a> ferrys::info_vehiculos_actuales[<a class="el" href="proyecto__ferrys_8c.html#a25c10a3ecea1866f766a2af7a7bf7da0">MAX_VEHICULOS</a>]</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -282,13 +297,24 @@ Data Fields</h2></td></tr>
 </div>
 </div>
 <hr/>The documentation for this struct was generated from the following file:<ul>
-<li>C:/Users/slara/OneDrive/proyectos profesionales/proyecto de programacion 2026/<a class="el" href="proyecto__ferrys_8c.html">proyecto_ferrys.c</a></li>
+<li><a class="el" href="proyecto__ferrys_8c.html">proyecto_ferrys.c</a></li>
 </ul>
 </div><!-- contents -->
-<!-- start footer part -->
-<hr class="footer"/><address class="footer"><small>
-Generated by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.14.0
-</small></address>
 </div><!-- doc-content -->
+<div id="page-nav" class="page-nav-panel">
+<div id="page-nav-resize-handle"></div>
+<div id="page-nav-tree">
+<div id="page-nav-contents">
+</div><!-- page-nav-contents -->
+</div><!-- page-nav-tree -->
+</div><!-- page-nav -->
+</div><!-- container -->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a href="structferrys.html">ferrys</a></li>
+    <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.14.0 </li>
+  </ul>
+</div>
 </body>
 </html>

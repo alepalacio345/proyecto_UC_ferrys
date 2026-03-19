@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['📋_20formato_20del_20archivo_20de_20entrada_20txt_0',['📋 Formato del Archivo de Entrada txt',['../C:/Users/slara/OneDrive/proyectos profesionales/proyecto de programacion 2026/README.md#autotoc_md3',1,'📋 Formato del Archivo de Entrada (<span class="tt">.txt</span>)'],['../C:/Users/slara/OneDrive/proyectos profesionales/proyecto de programacion 2026/README.md#autotoc_md8',1,'📋 Formato del Archivo de Entrada (<span class="tt">.txt</span>)']]]
+  ['⛴️_20simulador_20de_20flota_20de_20ferrys_20máquina_20de_20estados_0',['⛴️ Simulador de Flota de Ferrys Máquina de Estados',['../md__r_e_a_d_m_e.html',1,'⛴️ Simulador de Flota de Ferrys (Máquina de Estados)'],['../md__r_e_a_d_m_e.html#autotoc_md5',1,'⛴️ Simulador de Flota de Ferrys (Máquina de Estados)']]]
 ];

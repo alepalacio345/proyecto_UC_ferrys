@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['📊_20reportes_20generados_0',['📊 Reportes Generados',['../C:/Users/slara/OneDrive/proyectos profesionales/proyecto de programacion 2026/README.md#autotoc_md10',1,'']]]
+  ['📊_20reportes_20generados_0',['📊 Reportes Generados',['../md__r_e_a_d_m_e.html#autotoc_md10',1,'']]]
 ];

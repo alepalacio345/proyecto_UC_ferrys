@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['principales_0',['Principales',['../C:/Users/slara/OneDrive/proyectos profesionales/proyecto de programacion 2026/README.md#autotoc_md1',1,'⚙️ Características Principales'],['../C:/Users/slara/OneDrive/proyectos profesionales/proyecto de programacion 2026/README.md#autotoc_md6',1,'⚙️ Características Principales']]]
+  ['principales_0',['Principales',['../md__r_e_a_d_m_e.html#autotoc_md1',1,'⚙️ Características Principales'],['../md__r_e_a_d_m_e.html#autotoc_md6',1,'⚙️ Características Principales']]]
 ];
