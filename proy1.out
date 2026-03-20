@@ -2,9 +2,9 @@ Carga Nro. 1:
 Ferry Lilia Concepcion
 Viaje Nro. 1
 Num. vehiculos: 6
-Num. pasajeros: 11 (2 de la tercera edad)
+Num. pasajeros: 12 (2 de la tercera edad)
 Peso: 37.70 toneladas
-Ingreso: 10700.00 BsF.
+Ingreso: 11320.00 BsF.
 ID: CD345CC 	 Tipo: liviano
 ID: EV677VU 	 Tipo: policial
 ID: VY778TS 	 Tipo: ambulancia
@@ -14,8 +14,8 @@ ID: XE787GE 	 Tipo: carga
 
 Estadisticas:
 Total vehiculos transportados: 6
-Total pasajeros transportados: 11
-Total de ingresos: 10700.00 BsF.
-Num. pasajeros no trasladados: 0
+Total pasajeros transportados: 12
+Total de ingresos: 11320.00 BsF.
+Num. pasajeros no trasladados: 5
 Vehiculo mas frecuente: carga
 Mayor frec. vehiculos en espera: 6 (a las 08:06)

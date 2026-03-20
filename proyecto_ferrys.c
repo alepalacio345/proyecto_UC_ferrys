@@ -1,10 +1,11 @@
 /*
 Faltan poner informacion de aqui
-Integrantes: 
-C.I: 
-Seccion: 
+Integrantes: Saul Lara y Gabriel Rosario
+C.I: xxxxxxxx y 31.165.402
+Seccion: 06
 Materia: Fundamentos de Programacion
-Prof:
+Prof: Jose Henriquez 
+Preparador: Brigido Noguera
 */
 
 /**
@@ -117,7 +118,7 @@ void cargar_vehiculo_en_ferry(ferrys *ferry,vehiculos cola[],int *indice_cola,bo
 bool hacer_espacio_emergencia(ferrys *ferry_actual, vehiculos cola_actual[], int *indice_cola);
 void insertar_emergencia_cola(vehiculos cola[], int *indice, vehiculos nuevo);
 bool debe_zarpar(ferrys ferry_actual,int vehiculos_en_ferry,int vehiculos_en_cola,int pasajeros_actuales,float peso_actual,vehiculos siguiente_en_cola,int tiempo_universal);
-void procesar_carga_ferry(ferrys vector_ferrys[],int *turno_ferry,vehiculos cola[],int *indice_cola,bool *rampa_libre,int *tiempo_carga, int tiempo_universal,FILE *salida,int *numero_viaje_global,int *total_dia_vehiculos,int *total_dia_pasajeros,float *total_dia_ingresos,int frecuencia_tipos[]);
+void procesar_carga_ferry(ferrys vector_ferrys[],int turno_ferry, vehiculos cola[],int *indice_cola,bool *rampa_libre,int *tiempo_carga, int tiempo_universal,FILE *salida,int *numero_viaje_global,int *total_dia_vehiculos,int *total_dia_pasajeros,float *total_dia_ingresos,int frecuencia_tipos[], int *turno_control);
 void procesar_salida(ferrys ferry_actual, FILE *salida, int numero_viaje, int *dia_total_vehiculos, int *dia_total_pasajeros, float *dia_total_ingresos, int frec_vehiculos[]);
 void limpiar_consola();
 
@@ -329,18 +330,18 @@ int main(){
                     // =========================================================
                     //Llamar funcion para tradicional
 
-                    procesar_carga_ferry(vector_ferrys,&turno_ferry,vector_colaTradicional,&indice_tradicional,
+                    procesar_carga_ferry(vector_ferrys,turno_ferry,vector_colaTradicional,&indice_tradicional,
                         &rampa_libre,&tiempo_carga,tiempo_universal,salida,&numero_viaje_global,&total_dia_vehiculos,
-                        &total_dia_pasajeros,&total_dia_ingresos,frecuencia_tipos);
+                        &total_dia_pasajeros,&total_dia_ingresos,frecuencia_tipos,&turno_ferry);
                 }else{
                     // =========================================================
                     // LÓGICA SI EL FERRY EN EL MUELLE ES EXPRESS
                     // =========================================================
                     //Llamar funcion para express
 
-                    procesar_carga_ferry(vector_ferrys,&turno_ferry,vector_colaExpress,&indice_express,
+                    procesar_carga_ferry(vector_ferrys,turno_ferry,vector_colaExpress,&indice_express,
                         &rampa_libre,&tiempo_carga,tiempo_universal,salida,&numero_viaje_global,&total_dia_vehiculos,
-                        &total_dia_pasajeros,&total_dia_ingresos,frecuencia_tipos);
+                        &total_dia_pasajeros,&total_dia_ingresos,frecuencia_tipos,&turno_ferry);
 
                 }//PROCESAR CARGA FERRYS
             }
@@ -530,13 +531,6 @@ void cargar_ferrys(int orden[], ferrys vector_ferrys[]){
 
 /**
  * @brief Lee los datos del archivo de texto y puebla el arreglo de vehículos.
- * * Esta función recorre línea por línea el archivo de entrada hasta llegar al final (EOF).
- * Extrae la información de cada vehículo (pasajeros, peso, hora, placa, etc.) según 
- * el formato establecido en el proyecto y la guarda ordenadamente en las posiciones 
- * consecutivas del arreglo de estructuras.
- * * @param entrada Puntero al archivo de texto (previamente abierto en modo lectura).
- * @param vector_vehiculos Arreglo de estructuras tipo `vehiculos` que será llenado con los datos.
- * @param cantidad_vehiculos Puntero en el que se almacenará el total de vehículos registrados.
  */
 void cargar_vehiculos(FILE *entrada, vehiculos vector_vehiculos[],int *cantidad_vehiculos){
 
@@ -586,8 +580,6 @@ void cargar_vehiculos(FILE *entrada, vehiculos vector_vehiculos[],int *cantidad_
         vector_vehiculos[indice].Num_pasajeros_tercera_edad = numero_pasajeros_TCED;
         
         if((vector_vehiculos[indice].Num_pasajeros_adultos + vector_vehiculos[indice].Num_pasajeros_tercera_edad) > 20){
-            // Si la suma de ambos da más de 20 (ej. 15 + 15), es un dato corrupto.
-            // Por seguridad, anulamos los pasajeros de ese vehículo.
             vector_vehiculos[indice].Num_pasajeros_adultos = 0;
             vector_vehiculos[indice].Num_pasajeros_tercera_edad = 0;
         }
@@ -602,7 +594,6 @@ void cargar_vehiculos(FILE *entrada, vehiculos vector_vehiculos[],int *cantidad_
         
         //Validar tipo de ferry
         if(tipo_ferry != 0 && tipo_ferry != 1){
-            //si el tipo de ferry es invalido, se asigna express
             tipo_ferry = 0;
         }
 
@@ -612,13 +603,10 @@ void cargar_vehiculos(FILE *entrada, vehiculos vector_vehiculos[],int *cantidad_
             continue;
         }
 
-        //Validar si tienen placas iguales
-        //Se uso while por preferencias del profesor (:/)
         bool duplicado = false;
         int j = 0;
         while(j < indice){
             if(strcmp(vector_vehiculos[j].placa, placa) == 0){
-                //Vehiculo duplicado
                 duplicado = true;
                 break;
             }
@@ -629,26 +617,22 @@ void cargar_vehiculos(FILE *entrada, vehiculos vector_vehiculos[],int *cantidad_
 
         vector_vehiculos[indice].peso = peso;
          
-        if(Hora_llegada < 0 || Hora_llegada > 2359) continue; //Hora invalida, se ignoran vehiculos
+        if(Hora_llegada < 0 || Hora_llegada > 2359) continue; 
 
         int minutos = Hora_llegada % 100;
 
-        if(minutos >= 60) continue; //minutos invalidos
+        if(minutos >= 60) continue; 
         if(peso <= 0) continue;
-        // GR conversión corregida de peso
         if(vector_vehiculos[indice].tipo == 4){
-            //Guarda el peso en toneladas
             vector_vehiculos[indice].peso = peso;
         }else{
-            //Convierte kg a toneladas
-            vector_vehiculos[indice].peso = peso / 1000.0f;  // la f es para division en float
+            vector_vehiculos[indice].peso = peso / 1000.0f;  
         }
 
         vector_vehiculos[indice].tiempo_llegada = convertir_a_minutos(Hora_llegada);
         strcpy(vector_vehiculos[indice].placa,placa);
         vector_vehiculos[indice].tipo_ferry = tipo_ferry;
         
-        //acumentar indice_tradicional
         (*cantidad_vehiculos)++;
         indice++;
     }
@@ -657,10 +641,6 @@ void cargar_vehiculos(FILE *entrada, vehiculos vector_vehiculos[],int *cantidad_
 
 /**
  * @brief Ordena un arreglo de vehículos por su hora de llegada de menor a mayor.
- * Utiliza el algoritmo de ordenamiento de burbuja (Bubble Sort) para asegurar
- * que los vehículos sean procesados cronológicamente según su tiempo de llegada.
- * * @param vector Arreglo de estructuras tipo vehiculos a ordenar.
- * @param n Cantidad total de elementos en el arreglo.
  */
 void ordenar_por_hora(vehiculos vector[], int n){
 
@@ -676,40 +656,26 @@ void ordenar_por_hora(vehiculos vector[], int n){
 }
 
 /**
- * @brief Verifica el tiempo de viaje de los ferrys y actualiza su estado al regresar al muelle.
- * * Recorre el arreglo de ferrys buscando aquellos que se encuentren actualmente navegando (estado 2).
- * Calcula el tiempo exacto en el que deben regresar al muelle sumando su hora de salida y su tiempo
- * de viaje predeterminado. Si el tiempo actual de la simulación coincide con esa hora de regreso, 
- * el ferry cambia su estado a "Espera" (estado 3) y reinicia su hora de salida a 0, quedando libre 
- * para iniciar un nuevo proceso de carga.
- * * @param vector_ferrys Arreglo que contiene las estructuras de todos los ferrys de la flota.
- * @param tiempo_actual El minuto actual de la simulación (tiempo universal).
+ * @brief Verifica el tiempo de viaje de los ferrys y actualiza su estado.
  */
 void reiniciar_tiempo_de_viaje(ferrys vector_ferrys[],int tiempo_actual){
 
-    //var
     int tiempo_regreso;
 
     for(int i = 0; i < MAX_FERRYS; i++){
-        //validar que el ferry si alla salido
         if((vector_ferrys[i].hora_salida > 0) && (vector_ferrys[i].estado == 2) ){
-            //calculamos la hora que tiene que llegar el ferry al muelle
             tiempo_regreso = vector_ferrys[i].hora_salida + vector_ferrys[i].tiempo_de_viaje;
 
-            //validamos si ese tiempo se cumplio 
             if(tiempo_actual >= tiempo_regreso){
-                vector_ferrys[i].estado = 3; //entonces cambiamos su estado a espera
-                vector_ferrys[i].hora_salida = 0; //reiniciamos la hora de salida a 0
+                vector_ferrys[i].estado = 3; 
+                vector_ferrys[i].hora_salida = 0; 
             }
         }
     }      
 }
 
 /**
- * @brief Libera la rampa del ferry una vez que finaliza el tiempo de carga de un vehículo.
- * * @param rampa_libre Puntero a la variable booleana que indica si la rampa está disponible.
- * @param tiempo_universal Minuto actual de la simulación.
- * @param tiempo_carga Puntero al minuto en el que la rampa se liberará.
+ * @brief Libera la rampa del ferry una vez que finaliza el tiempo de carga.
  */
 void actualizar_rampa(bool *rampa_libre, int tiempo_universal, int *tiempo_carga){
     if(!(*rampa_libre) && tiempo_universal == *tiempo_carga){
@@ -718,12 +684,7 @@ void actualizar_rampa(bool *rampa_libre, int tiempo_universal, int *tiempo_carga
 }
 
 /**
- * @brief Gestiona el ingreso de vehículos de emergencia, haciendo espacio si es necesario.
- * Verifica si el primer vehículo en la cola es una emergencia y, de ser necesario,
- * desaloja vehículos convencionales del ferry para hacerle espacio respetando las capacidades.
- * * @param ferry Puntero a la estructura del ferry actual.
- * @param cola Arreglo que representa la cola de vehículos esperando abordar.
- * @param indice_cola Puntero a la cantidad de vehículos en la cola.
+ * @brief Gestiona el ingreso de vehículos de emergencia.
  */
 void manejar_emergencia(ferrys *ferry, vehiculos cola[], int *indice_cola){
     if (*indice_cola > 0){
@@ -769,14 +730,6 @@ void manejar_emergencia(ferrys *ferry, vehiculos cola[], int *indice_cola){
 
 /**
  * @brief Traslada el primer vehículo de la cola al interior del ferry.
- * Actualiza las estadísticas del ferry (peso, pasajeros, vehículos), desplaza
- * los elementos de la cola hacia adelante y bloquea la rampa por el tiempo de carga.
- * * @param ferry Puntero a la estructura del ferry actual.
- * @param cola Arreglo de la cola de vehículos.
- * @param indice_cola Puntero al contador de vehículos en la cola.
- * @param rampa_libre Puntero a la bandera de disponibilidad de la rampa.
- * @param tiempo_carga Puntero a la variable que almacenará el minuto de fin de carga.
- * @param tiempo_universal Minuto actual de la simulación.
  */
 void cargar_vehiculo_en_ferry(ferrys *ferry,vehiculos cola[],int *indice_cola,bool *rampa_libre,int *tiempo_carga, int tiempo_universal){
     
@@ -784,7 +737,7 @@ void cargar_vehiculo_en_ferry(ferrys *ferry,vehiculos cola[],int *indice_cola,bo
 
     ferry->vehiculos_actuales++;
 
-    ferry->peso_actual += cola[0].peso;
+    ferry->peso_actual += cola[0].peso = cola[0].peso;
 
     ferry->pasajeros_actuales +=
         cola[0].Num_pasajeros_adultos +
@@ -801,91 +754,62 @@ void cargar_vehiculo_en_ferry(ferrys *ferry,vehiculos cola[],int *indice_cola,bo
 }
 
 /**
- * @brief Orquesta el proceso completo de carga y zarpe de un ferry en el muelle.
- * Coordina la liberación de la rampa, la atención de emergencias, la evaluación 
- * de condiciones de zarpe y el ingreso de nuevos vehículos.
- * * @param vector_ferrys Arreglo con la información de todos los ferrys.
- * @param turno_ferry Puntero al índice del ferry que está actualmente en el muelle.
- * @param cola Arreglo de la cola de espera correspondiente al tipo de ferry.
- * @param indice_cola Puntero al contador de vehículos en la cola.
- * @param rampa_libre Puntero al estado actual de la rampa de carga.
- * @param tiempo_carga Puntero a la hora en que finaliza la carga actual.
- * @param tiempo_universal Minuto actual de la simulación.
- * @param salida Puntero al archivo de reporte de salida.
- * @param numero_viaje_global Puntero al contador total de viajes del día.
- * @param total_dia_vehiculos Puntero al acumulador diario de vehículos.
- * @param total_dia_pasajeros Puntero al acumulador diario de pasajeros.
- * @param total_dia_ingresos Puntero al acumulador diario de ingresos.
- * @param frecuencia_tipos Arreglo acumulador de los tipos de vehículos que han viajado.
+ * @brief Orquesta el proceso completo de carga y zarpe de un ferry.
+ * @param turno_ferry PASADO POR VALOR.
+ * @param turno_control PUNTERO para actualizar el estado en el main.
  */
-void procesar_carga_ferry(ferrys vector_ferrys[], int *turno_ferry, vehiculos cola[], int *indice_cola, bool *rampa_libre, int *tiempo_carga, int tiempo_universal, FILE *salida, int *numero_viaje_global, int *total_dia_vehiculos, int *total_dia_pasajeros, float *total_dia_ingresos, int frecuencia_tipos[]) {
+void procesar_carga_ferry(ferrys vector_ferrys[], int turno_ferry, vehiculos cola[], int *indice_cola, bool *rampa_libre, int *tiempo_carga, int tiempo_universal, FILE *salida, int *numero_viaje_global, int *total_dia_vehiculos, int *total_dia_pasajeros, float *total_dia_ingresos, int frecuencia_tipos[], int *turno_control){
 
-    // Creamos un puntero (un atajo) al ferry que le toca el turno actual
-    ferrys *ferry = &vector_ferrys[*turno_ferry];
+    // Ahora turno_ferry entra como valor directo al índice
+    ferrys *ferry = &vector_ferrys[turno_ferry];
 
-    // 1. Rampa
     actualizar_rampa(rampa_libre, tiempo_universal, tiempo_carga);
-
-    // 2. Emergencias
     manejar_emergencia(ferry, cola, indice_cola);
 
-    // 3. Operaciones si la rampa está libre
     if (*rampa_libre) {
-
-        // Preparamos el siguiente carro que va a entrar (si es que hay alguno)
         vehiculos *siguiente = NULL;
-        vehiculos vacio = {0}; // Un "vehículo fantasma" vacío por si la cola está en cero
+        vehiculos vacio = {0};
 
         if (*indice_cola > 0) {
             siguiente = &cola[0];
         }
 
-        // 4. Decidir zarpe evaluando todas las reglas del negocio
         bool zarpar_por_reglas = debe_zarpar(*ferry, ferry->vehiculos_actuales, *indice_cola, ferry->pasajeros_actuales, ferry->peso_actual, (siguiente ? *siguiente : vacio), tiempo_universal);
 
         if (zarpar_por_reglas) {
             procesar_salida(*ferry, salida, (*numero_viaje_global)++, total_dia_vehiculos, total_dia_pasajeros, total_dia_ingresos, frecuencia_tipos);
 
             ferry->hora_salida = tiempo_universal;
-            ferry->estado = 2; // Estado 2 = Viajando
+            ferry->estado = 2; 
 
             ferry->peso_actual = 0;
             ferry->pasajeros_actuales = 0;
             ferry->vehiculos_actuales = 0;
 
-            *turno_ferry = (*turno_ferry + 1) % MAX_FERRYS;
+            // Se usa el puntero de control para avisar al main que el ferry ya no está en el muelle
+            *turno_control = (*turno_control + 1) % MAX_FERRYS;
             *rampa_libre = true;
             *tiempo_carga = 0;
         } 
         else if (*indice_cola > 0) {
-
-            // 5. Validaciones de capacidad extrema (Por si el carro que va a entrar rompe el límite)
             bool full_peso = (ferry->peso_actual + cola[0].peso > ferry->peso_maximo);
             bool full_pasajeros = (ferry->pasajeros_actuales + cola[0].Num_pasajeros_adultos + cola[0].Num_pasajeros_tercera_edad + 1 > ferry->cap_pasajeros);
             bool full_carros = (ferry->vehiculos_actuales >= ferry->cap_max_vehiculos);
 
-            // Si se rompe algún límite, forzamos el zarpe de emergencia
             if (full_peso || full_pasajeros || full_carros) {
-                
-                // Solo zarpamos si hay al menos un vehículo adentro
                 if (ferry->vehiculos_actuales > 0) {
                     procesar_salida(*ferry, salida, (*numero_viaje_global)++, total_dia_vehiculos, total_dia_pasajeros, total_dia_ingresos, frecuencia_tipos);
-
                     ferry->hora_salida = tiempo_universal;
-                    ferry->estado = 2; // Estado 2 = Viajando
-
+                    ferry->estado = 2;
                     ferry->peso_actual = 0;
                     ferry->pasajeros_actuales = 0;
                     ferry->vehiculos_actuales = 0;
-
-                    *turno_ferry = (*turno_ferry + 1) % MAX_FERRYS;
+                    *turno_control = (*turno_control + 1) % MAX_FERRYS;
                     *rampa_libre = true;
                     *tiempo_carga = 0;
                 }
-                return; // Cortamos la función para que no intente cargar el carro
+                return;
             }
-
-            // 6. Si hay espacio y no rompemos límites, metemos el carro al ferry
             cargar_vehiculo_en_ferry(ferry, cola, indice_cola, rampa_libre, tiempo_carga, tiempo_universal);
         }
     }
@@ -893,13 +817,7 @@ void procesar_carga_ferry(ferrys vector_ferrys[], int *turno_ferry, vehiculos co
 
 /**
  * @brief Inserta un vehículo de emergencia en la primera posición de la cola.
- * Desplaza todos los demás vehículos una posición hacia atrás para otorgarle
- * prioridad absoluta al vehículo entrante.
- * * @param cola Arreglo que representa la cola de espera.
- * @param indice Puntero a la cantidad actual de vehículos en la cola.
- * @param nuevo Estructura del vehículo de emergencia a insertar.
  */
-//Las emergencias tienen prioridad, pero el ferry sigue respetando las restricciones físicas de peso y capacidad.
 void insertar_emergencia_cola(vehiculos cola[], int *indice, vehiculos nuevo){
     
     if(*indice >= MAX_CANTIDAD_COLAS){
@@ -917,105 +835,60 @@ void insertar_emergencia_cola(vehiculos cola[], int *indice, vehiculos nuevo){
 
 
 /**
- * @brief Desaloja un vehículo convencional del ferry para hacer espacio a una emergencia.
- * * Busca de atrás hacia adelante en el arreglo de vehículos a bordo el último 
- * vehículo que no sea de emergencia (tipo < 5). Al encontrarlo, resta su peso,
- * pasajeros y lo elimina del ferry. Luego, lo inserta en la posición [1] de la 
- * cola de espera (justo detrás del vehículo de emergencia actual) desplazando
- * el resto de los vehículos en la cola.
- * * @param ferry_actual Puntero al ferry que se está cargando actualmente.
- * @param cola_actual Arreglo que representa la cola de vehículos (Tradicional o Express).
- * @param indice_cola Puntero al contador total de vehículos en esa cola.
- * @return true si logró sacar un vehículo normal, false si todos a bordo son emergencias.
+ * @brief Desaloja un vehículo convencional para hacer espacio a una emergencia.
  */
 bool hacer_espacio_emergencia(ferrys *ferry_actual, vehiculos cola_actual[], int *indice_cola) {
     
-    // Recorremos los carros a bordo de atrás hacia adelante
     for (int i = ferry_actual->vehiculos_actuales - 1; i >= 0; i--) {
         int tipo_vehiculo = ferry_actual->info_vehiculos_actuales[i].tipo;
         
-        // Si NO es ambulancia (5), bombero (6) o policía (7)
         if (tipo_vehiculo < 5) {
-            
-            // 1. Guardar una copia del vehículo que vamos a sacar ("sacrificado")
             vehiculos vehiculo_sacrificado = ferry_actual->info_vehiculos_actuales[i];
             
-            // 2. Restar sus atributos de los totales del ferry
             ferry_actual->peso_actual -= vehiculo_sacrificado.peso;
             ferry_actual->pasajeros_actuales -= (vehiculo_sacrificado.Num_pasajeros_adultos + 
-                                                 vehiculo_sacrificado.Num_pasajeros_tercera_edad + 1); // +1 por el chofer
+                                                 vehiculo_sacrificado.Num_pasajeros_tercera_edad + 1);
             
-            // 3. Eliminarlo del arreglo del ferry (rodar los que estaban después de él)
             for (int k = i; k < ferry_actual->vehiculos_actuales - 1; k++) {
                 ferry_actual->info_vehiculos_actuales[k] = ferry_actual->info_vehiculos_actuales[k + 1];
             }
-            ferry_actual->vehiculos_actuales--; // Reducir el contador del barco
+            ferry_actual->vehiculos_actuales--;
             
-            // 4. Hacer espacio en la cola (rodando de la posición 1 en adelante)
-            // CUIDADO: La posición [0] tiene a la ambulancia, no la podemos tocar.
             for (int j = *indice_cola; j > 1; j--) {
                 cola_actual[j] = cola_actual[j - 1];
             }
             
-            // 5. Insertar al sacrificado justo detrás de la ambulancia (en [1])
             cola_actual[1] = vehiculo_sacrificado;
             
-            // 6. Aumentar el tamaño de la cola porque devolvimos un carro
             if(*indice_cola < MAX_CANTIDAD_COLAS){
                 (*indice_cola)++;
-            }else{
-                printf("Cola llena al devolver vehiculo\n");
             }
-            
-            // Avisamos que la operación fue un éxito
             return true; 
         }
     }
-    
-    // Si terminó el ciclo y no retornó true, es porque no encontró carros normales
     return false;
 }
 
 
 /**
- * @brief Evalúa si el ferry en el muelle cumple las condiciones operativas para zarpar.
- * * Verifica primero la regla del 30% de capacidad mínima vehicular. Si se cumple, 
- * el ferry zarpará si alcanza su capacidad máxima de vehículos o pasajeros, si no hay 
- * más vehículos en cola, o si el ingreso del próximo vehículo excede el peso máximo 
- * permitido (60 toneladas para Express, 80 toneladas para Tradicional). También 
- * fuerza el zarpe al finalizar el día (minuto 1439).
- * * @param vehiculos_en_ferry Cantidad de vehículos ya ingresados al ferry.
- * @param vehiculos_en_cola Cantidad de vehículos esperando en la rampa.
- * @param peso_actual Peso total acumulado actualmente en el ferry (en toneladas).
- * @param ferry_actual Estructura con los datos del ferry que se evalúa.
- * @param siguiente_en_cola Estructura del próximo vehículo en la cola (para evaluar su peso).
- * @param pasajeros_actuales Cantidad total de pasajeros a bordo.
- * @param tiempo_universal Minuto actual de la simulación.
- * @return true si el ferry debe iniciar su viaje, false si debe seguir esperando/cargando.
+ * @brief Evalúa si el ferry cumple las condiciones operativas para zarpar.
  */
 bool debe_zarpar(ferrys ferry_actual,int vehiculos_en_ferry,int vehiculos_en_cola,int pasajeros_actuales,float peso_actual,vehiculos siguiente_en_cola,int tiempo_universal){
-    // Variable única de retorno
     bool respuesta_zarpe = false; 
     float peso_max = (ferry_actual.tipo == 0) ? 60.0 : 80.0;
 
-    // REGLA 1: Fin del día (Zarpa sí o sí, PERO solo si tiene al menos 1 carro)
     if (tiempo_universal >= 1439 && vehiculos_en_ferry > 0) {
         respuesta_zarpe = true;
     }
-    // REGLA 2: Límite máximo de vehículos alcanzado
     else if (vehiculos_en_ferry >= ferry_actual.cap_max_vehiculos) {
         respuesta_zarpe = true;
     }
-    // REGLA 3: Límite máximo de pasajeros alcanzado
     else if (pasajeros_actuales >= ferry_actual.cap_pasajeros) {
         respuesta_zarpe = true;
     }
-    // REGLA 4: Límite de PESO. (Si meter el siguiente hunde el barco, zarpa)
     else if (peso_actual + siguiente_en_cola.peso > peso_max) {
         respuesta_zarpe = true;
     }
-    // REGLA 5: Regla del 30% y Cola Vacía 
-    // (Solo evalúa esto si el barco es seguro y no se ha llenado)
     else if (vehiculos_en_cola == 0 && vehiculos_en_ferry >= ferry_actual.cap_min_vehiculos) {
         respuesta_zarpe = true;
     }
@@ -1025,17 +898,6 @@ bool debe_zarpar(ferrys ferry_actual,int vehiculos_en_ferry,int vehiculos_en_col
 
 /**
  * @brief Imprime el reporte del viaje actual y calcula los ingresos generados.
- * Calcula el costo del flete de los vehículos y los pasajes de las personas
- * basándose en el tipo de ferry y la clase de pasaje. Además, acumula las
- * estadísticas globales del día que se imprimen al final.
- *
- * @param ferry_actual Estructura del ferry que acaba de zarpar.
- * @param salida Puntero al archivo donde se escribirá el reporte.
- * @param numero_viaje Contador del número de viaje en el día.
- * @param dia_total_vehiculos Puntero al acumulador de vehículos del día.
- * @param dia_total_pasajeros Puntero al acumulador de pasajeros del día.
- * @param dia_total_ingresos Puntero al acumulador de dinero en BsF.
- * @param frec_vehiculos Arreglo acumulador para saber el vehículo más frecuente.
  */
 void procesar_salida(ferrys ferry_actual, FILE *salida, int numero_viaje,
         int *dia_total_vehiculos, int *dia_total_pasajeros, float *dia_total_ingresos, int frec_vehiculos[]) {
@@ -1045,65 +907,39 @@ void procesar_salida(ferrys ferry_actual, FILE *salida, int numero_viaje,
     
     for (int i = 0; i < ferry_actual.vehiculos_actuales; i++) {
         vehiculos v = ferry_actual.info_vehiculos_actuales[i];
-
-        // Calcular personas de tercera edad para imprimirlo
         tercera_edad_viaje += v.Num_pasajeros_tercera_edad;
         
-        // Sumar al arreglo de frecuencias para las estadisticas finales
         if(v.tipo >= 1 && v.tipo <= 7) {
             frec_vehiculos[v.tipo]++;
         }
         
-        // --- CÁLCULO DE INGRESOS ---
         if (ferry_actual.tipo == 1) { 
-            // FERRY TRADICIONAL
             if (v.tipo == 1) ingreso_viaje += V_LIVIANO_TRAD;
             else if (v.tipo == 2) ingreso_viaje += V_RUSTICO_TRAD;
             else if (v.tipo == 3) ingreso_viaje += V_MICROBUS_TRAD;
             else if (v.tipo == 4) ingreso_viaje += V_CARGA_TRAD;
-            // Vehículos de emergencia viajan gratis (se asume 0 BsF)
             
-            // Pasajes de personas
-            if (v.Num_pasajeros_adultos > 0 || v.Num_pasajeros_tercera_edad > 0) { //cambio, verificaba traslada pasajeros == 1
-                
-                // Adultos
+            if (v.Num_pasajeros_adultos > 0 || v.Num_pasajeros_tercera_edad > 0) {
                 if (v.pasaje_adquirido_adut == 0) ingreso_viaje += (float)v.Num_pasajeros_adultos * T_ADULTO_VIP_TRAD;
                 else ingreso_viaje += (float)v.Num_pasajeros_adultos * T_ADULTO_TUR_TRAD;
-                
-                // Tercera Edad
                 if (v.pasaje_adquirido_tercera_ed == 0) ingreso_viaje += (float)v.Num_pasajeros_tercera_edad * T_MAYOR_VIP_TRAD;
                 else ingreso_viaje += (float)v.Num_pasajeros_tercera_edad * T_MAYOR_TUR_TRAD;
-
-                
             }
-            
         } else { 
-            // FERRY EXPRESS
             if (v.tipo == 1) ingreso_viaje += V_LIVIANO_EXP;
             else if (v.tipo == 2) ingreso_viaje += V_RUSTICO_EXP;
             else if (v.tipo == 3) ingreso_viaje += V_MICROBUS_EXP;
             else if (v.tipo == 4) ingreso_viaje += V_CARGA_EXP;
-            // Vehículos de emergencia viajan gratis (se asume 0 BsF)
 
-            // Pasajes de personas
-            if (v.Num_pasajeros_adultos > 0 || v.Num_pasajeros_tercera_edad > 0) { //cambio, verificaba traslada pasajeros == 1
-
-                // Adultos
+            if (v.Num_pasajeros_adultos > 0 || v.Num_pasajeros_tercera_edad > 0) {
                 if (v.pasaje_adquirido_adut == 0) ingreso_viaje += (float)v.Num_pasajeros_adultos * T_ADULTO_VIP_EXP;
                 else ingreso_viaje += (float)v.Num_pasajeros_adultos * T_ADULTO_TUR_EXP;
-                
-                // Tercera Edad
                 if (v.pasaje_adquirido_tercera_ed == 0) ingreso_viaje += (float)v.Num_pasajeros_tercera_edad * T_MAYOR_VIP_EXP;
                 else ingreso_viaje += (float)v.Num_pasajeros_tercera_edad * T_MAYOR_TUR_EXP;
-
-                
             }
         }
     }
 
-    // --- IMPRESIÓN DEL REPORTE DEL VIAJE ---
-    
-    // En Pantalla
     printf("\nCarga Nro. %d:\n", numero_viaje);
     printf("Ferry %s\n", ferry_actual.nombre);
     printf("Viaje Nro. %d\n", numero_viaje);
@@ -1112,7 +948,6 @@ void procesar_salida(ferrys ferry_actual, FILE *salida, int numero_viaje,
     printf("Peso: %.2f toneladas\n", ferry_actual.peso_actual);
     printf("Ingreso: %.2f BsF.\n", ingreso_viaje);
     
-    // En Archivo
     fprintf(salida, "Carga Nro. %d:\n", numero_viaje);
     fprintf(salida, "Ferry %s\n", ferry_actual.nombre);
     fprintf(salida, "Viaje Nro. %d\n", numero_viaje);
@@ -1121,11 +956,9 @@ void procesar_salida(ferrys ferry_actual, FILE *salida, int numero_viaje,
     fprintf(salida, "Peso: %.2f toneladas\n", ferry_actual.peso_actual);
     fprintf(salida, "Ingreso: %.2f BsF.\n", ingreso_viaje);
     
-    // Listado de Vehiculos
     for (int i = 0; i < ferry_actual.vehiculos_actuales; i++) {
         vehiculos v = ferry_actual.info_vehiculos_actuales[i];
         char str_tipo[20];
-        
         switch(v.tipo) {
             case 1: strcpy(str_tipo, "liviano"); break;
             case 2: strcpy(str_tipo, "rustico"); break;
@@ -1136,37 +969,24 @@ void procesar_salida(ferrys ferry_actual, FILE *salida, int numero_viaje,
             case 7: strcpy(str_tipo, "policial"); break;
             default: strcpy(str_tipo, "desconocido"); break;
         }
-        
         printf("ID: %s \t Tipo: %s\n", v.placa, str_tipo);
         fprintf(salida, "ID: %s \t Tipo: %s\n", v.placa, str_tipo);
     }
     printf("\n");
     fprintf(salida, "\n");
 
-    // --- ACTUALIZACIÓN DE ESTADÍSTICAS GLOBALES ---
     *dia_total_vehiculos += ferry_actual.vehiculos_actuales;
     *dia_total_pasajeros += ferry_actual.pasajeros_actuales;
     *dia_total_ingresos += ingreso_viaje;
 }
 
-
-
-
 /**
  * @brief Limpia la pantalla de la consola o terminal.
- * * @details Utiliza directivas de preprocesador para detectar el sistema operativo 
- * en el que se está ejecutando el programa. Si detecta un entorno Windows (_WIN32), 
- * invoca el comando "cls". Si detecta un entorno tipo Unix (Linux), 
- * invoca el comando "clear".
- * * @note Requiere que la librería <stdlib.h> esté incluida en el archivo para 
- * poder hacer uso de la función del sistema system().
  */
 void limpiar_consola(){
-
 #ifdef _WIN32
     system("cls");
 #else
     system("clear");
 #endif
-
 }
