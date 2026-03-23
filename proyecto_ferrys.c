@@ -1,7 +1,6 @@
 /*
-Faltan poner informacion de aqui
 Integrantes: Saul Lara y Gabriel Rosario
-C.I: xxxxxxxx y 31.165.402
+C.I: 31.456.395, 31.165.402
 Seccion: 06
 Materia: Fundamentos de Programacion
 Prof: Jose Henriquez 
@@ -14,7 +13,7 @@ Preparador: Brigido Noguera
  * @brief Programa de simulación para el control de carga y zarpe de ferrys.
  * @version 1.0
  * @date 2026-03-17
- * * @copyright Copyright (c) 2026 //bien cacheroso
+ * * @copyright Copyright (c) 2026
  */
 
 #include <stdio.h>
@@ -152,7 +151,7 @@ int main(){
     //Estructuras//
     vehiculos vector_vehiculos[MAX_VEHICULOS];
     vehiculos vector_colaExpress[MAX_CANTIDAD_COLAS];
-    vehiculos vector_colaTradicional[MAX_CANTIDAD_COLAS]; //Estaba como vector_colaTradiccional (GR)
+    vehiculos vector_colaTradicional[MAX_CANTIDAD_COLAS]; //Estaba como vector_colaTradiccional
     ferrys vector_ferrys[MAX_FERRYS];
 
     // Apertura y validación de flujos de datos (Entrada/Salida)
@@ -210,7 +209,7 @@ int main(){
         cargar_vehiculos(entrada,vector_vehiculos,&cantidad_vehiculos);
 
         // Normalización de datos: Asegura que el procesamiento sea cronológico
-        //Ordena los vehiculos por tiempo de llegada para facilitar la simulacion (GR)
+        //Ordena los vehiculos por tiempo de llegada para facilitar la simulacion
         ordenar_por_hora(vector_vehiculos, cantidad_vehiculos);
         
         if(cantidad_vehiculos > 0){
@@ -276,7 +275,7 @@ int main(){
                                 //ponemos a el vehiculo con prioridad de primero
                             }
                         }else{
-                            //Tipo_ferry == 0 (GR)
+                            //Tipo_ferry == 0
                             // Va a la express. 
                             //validando cantidad express
                             if(indice_express >= MAX_CANTIDAD_COLAS){
@@ -430,7 +429,7 @@ int main(){
         printf("Total de ingresos: %.2f BsF.\n", total_dia_ingresos);
         printf("Num. pasajeros no trasladados: %d\n", pasajeros_varados);
         printf("Vehiculo mas frecuente: %s\n", str_tipo_frecuente);
-        printf("Mayor frec. vehiculos en espera: %d (a las %02d:%02d)\n", mayor_frecuencia_espera, hora_militar_espera_h, hora_militar_espera_m); //: en hora (GR)
+        printf("Mayor frec. vehiculos en espera: %d (a las %02d:%02d)\n", mayor_frecuencia_espera, hora_militar_espera_h, hora_militar_espera_m);
 
         fprintf(salida, "Estadisticas:\n");
         fprintf(salida, "Total vehiculos transportados: %d\n", total_dia_vehiculos);
@@ -438,7 +437,7 @@ int main(){
         fprintf(salida, "Total de ingresos: %.2f BsF.\n", total_dia_ingresos);
         fprintf(salida, "Num. pasajeros no trasladados: %d\n", pasajeros_varados);
         fprintf(salida, "Vehiculo mas frecuente: %s\n", str_tipo_frecuente);
-        fprintf(salida, "Mayor frec. vehiculos en espera: %d (a las %02d:%02d)\n", mayor_frecuencia_espera, hora_militar_espera_h, hora_militar_espera_m); //: en hora (GR)
+        fprintf(salida, "Mayor frec. vehiculos en espera: %d (a las %02d:%02d)\n", mayor_frecuencia_espera, hora_militar_espera_h, hora_militar_espera_m);
 
     }
 
@@ -552,7 +551,7 @@ void cargar_vehiculos(FILE *entrada, vehiculos vector_vehiculos[],int *cantidad_
     //recorrer el archivo hasta fin de archivo 
     while(fscanf(entrada,"%i %i %i %i %i %f %i %29s %i",&codigo_vehiculo,
                  &numero_pasajeros_adut,&numero_pasajeros_TCED,&tipo_pasaje_adut,
-                 &tipo_pasaje_TCED,&peso,&Hora_llegada,placa,&tipo_ferry) == 9){//!= EOF es inseguro (GR)
+                 &tipo_pasaje_TCED,&peso,&Hora_llegada,placa,&tipo_ferry) == 9){
         
         if(indice >= MAX_VEHICULOS){
             printf("Advertencia: se excedio la capacidad de vehiculos\n");
@@ -754,7 +753,7 @@ void cargar_vehiculo_en_ferry(ferrys *ferry,vehiculos cola[],int *indice_cola,bo
 }
 
 /**
- * @brief Orquesta el proceso completo de carga y zarpe de un ferry.
+ * @brief Coordina el proceso completo de carga y zarpe de un ferry.
  * @param turno_ferry PASADO POR VALOR.
  * @param turno_control PUNTERO para actualizar el estado en el main.
  */
