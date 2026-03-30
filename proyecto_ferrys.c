@@ -239,7 +239,7 @@ int main(){
                     if(es_emergencia){
                         vector_vehiculos[i].tipo_ferry = vector_ferrys[turno_ferry].tipo;
                     }
-
+                    
                     // Verificamos a qué cola va
                     if(vector_vehiculos[i].tipo_ferry){
                         //COLA DEL TRADICIONAL
