@@ -3,8 +3,7 @@ Integrantes: Saul Lara y Gabriel Rosario
 C.I: 31.456.395, 31.165.402
 Seccion: 06
 Materia: Fundamentos de Programacion
-Prof: Jose Henriquez 
-Preparador: Brigido Noguera
+Prof: Brigido Noguera
 */
 
 /**
@@ -230,7 +229,8 @@ int main(){
             // --- Fase 1: Gestión de Arribos ---
             // Clasifica vehículos entrantes en sus respectivas colas (Express o Tradicional)
             // priorizando servicios de emergencia (Ambulancia, Bomberos, Policía).
-            for(int i = 0; i < cantidad_vehiculos; i++){
+            int i = 0; //control del ciclo
+            while(i < cantidad_vehiculos){
                 // Si la hora de llegada del vehiculo coincide con el reloj actual
                 if(vector_vehiculos[i].tiempo_llegada == tiempo_universal){
                     
@@ -239,7 +239,7 @@ int main(){
                     if(es_emergencia){
                         vector_vehiculos[i].tipo_ferry = vector_ferrys[turno_ferry].tipo;
                     }
-
+                    
                     // Verificamos a qué cola va
                     if(vector_vehiculos[i].tipo_ferry){
                         //COLA DEL TRADICIONAL
@@ -287,6 +287,8 @@ int main(){
                         }
                     }
                 }
+                //CONTADOR DEL CICLO PRINCIPAL
+                i++;
             }
 
 
@@ -376,6 +378,7 @@ int main(){
                         
             //EL TIEMPO AVANZA
             tiempo_universal++;
+           
         }
 
         // =========================================================
